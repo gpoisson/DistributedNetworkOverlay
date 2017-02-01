@@ -1,5 +1,37 @@
 package overlay.transport;
 
-public class TCPServerThread {
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+
+public class TCPServerThread implements Runnable {
+	
+	private ServerSocket serverSocket;
+	private ArrayList<Socket> messagingNodes;
+	private int portnumber;
+	private boolean debug = false;
+	
+	public TCPServerThread(ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
+		this.messagingNodes = messagingNodes;
+		this.portnumber = portnumber;
+		this.debug = debug;
+	}
+
+	//@Override
+	public void run() {
+		if (debug) System.out.println(" TCPServerThread running in a new thread.");
+		try {
+			serverSocket = new ServerSocket(portnumber);
+			if (debug) System.out.println(" TCPServerThread awaiting new connection on port number " + serverSocket.getLocalPort());
+			Socket newSocket = serverSocket.accept();
+			messagingNodes.add(newSocket);
+			if (debug) System.out.println(" TCPServerThread connected to new client.");
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		
+		if (debug) System.out.println(" TCPServerThread exiting.");
+	}
 
 }
