@@ -2,9 +2,9 @@ package overlay.wireformats;
 
 public abstract class Message {
 	
-	private int type;
-	private long timestamp;
-	private String identifier;
-	private int tracker;
+	protected int type;
+	protected long timestamp = System.nanoTime();
+	protected String identifier;
+	protected int tracker;
 	
 }
