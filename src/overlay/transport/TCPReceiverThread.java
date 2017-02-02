@@ -23,8 +23,10 @@ public class TCPReceiverThread implements Runnable {
 		int dataLength;
 		while (socket != null) {
 			try {
+				if (debug) System.out.println("  TCPReceiverThread waiting for message length...");
 				dataLength = din.readInt();
-				
+				if (debug) System.out.println("  TCPReceiverThread received message of length: " + dataLength);
+				if (debug) System.out.println("  TCPReceiverThread awaiting byte array message delivery...");
 				byte[] data = new byte[dataLength];
 				din.readFully(data,  0,  dataLength);
 			} catch (SocketException se) {

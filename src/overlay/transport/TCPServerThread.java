@@ -27,6 +27,9 @@ public class TCPServerThread implements Runnable {
 			Socket newSocket = serverSocket.accept();
 			messagingNodes.add(newSocket);
 			if (debug) System.out.println(" TCPServerThread connected to new client.");
+			if (debug) System.out.println(" TCPServerThread is spawning a TCPReceiverThread to listen for incoming data...");
+			Thread receiver = new Thread(new TCPReceiverThread(newSocket, debug));
+			receiver.start();
 		} catch (IOException e) {
 			System.out.println(e);
 		}
