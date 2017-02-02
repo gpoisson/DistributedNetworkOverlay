@@ -11,7 +11,7 @@ public class TCPServerThread implements Runnable {
 	private ArrayList<Socket> messagingNodes;
 	private int portnumber;
 	private boolean debug = false;
-	private boolean shutDown = false;
+	public boolean shutDown = false;
 	
 	public TCPServerThread(ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
 		this.messagingNodes = messagingNodes;
@@ -30,7 +30,8 @@ public class TCPServerThread implements Runnable {
 				messagingNodes.add(newSocket);
 				if (debug) System.out.println(" TCPServerThread connected to new client.");
 				if (debug) System.out.println(" TCPServerThread is spawning a TCPReceiverThread to listen for incoming data...");
-				Thread receiver = new Thread(new TCPReceiverThread(newSocket, debug));
+				TCPSender sender = new TCPSender(newSocket, debug);
+				Thread receiver = new Thread(new TCPReceiverThread(sender, newSocket, debug));
 				receiver.start();
 			}
 		} catch (IOException e) {

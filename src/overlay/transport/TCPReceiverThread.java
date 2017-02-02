@@ -11,13 +11,14 @@ import overlay.wireformats.Register;
 public class TCPReceiverThread implements Runnable {
 
 	private Socket socket;
+	private TCPSender sender;
 	private DataInputStream din;
 	private boolean debug;
 	
 	private final int REGISTER = 0;
 	private final int DEREGISTER = 1;
 	
-	public TCPReceiverThread(Socket socket, boolean debug) throws IOException {
+	public TCPReceiverThread(TCPSender sender, Socket socket, boolean debug) throws IOException {
 		this.socket = socket;
 		this.debug = debug;
 		din = new DataInputStream(socket.getInputStream());
@@ -59,6 +60,7 @@ public class TCPReceiverThread implements Runnable {
 		// Register message
 		if (msgType == REGISTER) {
 			if (debug) System.out.println("  TCPReceiver received REGISTER message...");
+			
 		}
 		else if (msgType == DEREGISTER) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER message...");

@@ -33,7 +33,7 @@ public class MessagingNode extends Node {
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println(" Connection successfully established. Preparing to send registration request...");
 			mn.sender = new TCPSender(mn.socket, mn.debug);
-			mn.receiver = new Thread(new TCPReceiverThread(mn.socket, mn.debug));
+			mn.receiver = new Thread(new TCPReceiverThread(mn.sender, mn.socket, mn.debug));
 			mn.receiver.start();
 			mn.register();
 			if (mn.debug) System.out.println("Messaging node built.");
