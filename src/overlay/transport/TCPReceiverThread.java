@@ -9,15 +9,17 @@ public class TCPReceiverThread implements Runnable {
 
 	private Socket socket;
 	private DataInputStream din;
+	private boolean debug;
 	
-	public TCPReceiverThread(Socket socket) throws IOException {
+	public TCPReceiverThread(Socket socket, boolean debug) throws IOException {
 		this.socket = socket;
+		this.debug = debug;
 		din = new DataInputStream(socket.getInputStream());
 	}
 	
 	@Override
 	public void run() {
-		
+		if (debug) System.out.println("  TCPReceiverThread spawned.");
 		int dataLength;
 		while (socket != null) {
 			try {
@@ -33,6 +35,7 @@ public class TCPReceiverThread implements Runnable {
 				break;
 			}
 		}
+		if (debug) System.out.println("  TCPReceiverThread exiting.");
 		
 	}
 

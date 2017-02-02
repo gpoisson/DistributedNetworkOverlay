@@ -7,4 +7,10 @@ public abstract class Message {
 	protected String identifier;
 	protected int tracker;
 	
+	public byte[] getByteArray() {
+		String outString = type + " " + timestamp + " " + identifier + " " + tracker;
+		byte[] out = outString.getBytes();
+		return out;
+	}
+	
 }

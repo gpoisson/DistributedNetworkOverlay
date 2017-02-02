@@ -1,16 +1,17 @@
 package overlay.node;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
 
 public class Registry extends Node {
 
 	public Thread server;
-	public Socket socket;
 	public TCPSender sender;
 	public Thread receiver;
 	public ArrayList<Socket> messagingNodes;
@@ -31,6 +32,7 @@ public class Registry extends Node {
 		// Spawn a server thread to listen for incoming connections and add them to messagingNodes
 		reg.server = new Thread(new TCPServerThread(reg.messagingNodes, reg.portNumber, reg.debug));
 		reg.server.start();
+		
 		if (reg.debug) System.out.println("Registry node built. Awaiting user input.");
 		
 		// Wait for user input on main thread
