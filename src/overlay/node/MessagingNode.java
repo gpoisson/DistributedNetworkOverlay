@@ -27,10 +27,13 @@ public class MessagingNode extends Node {
 			MessagingNode mn = new MessagingNode();
 			mn.hostname = args[0];
 			mn.portNumber = Integer.parseInt(args[1]);
+			if (mn.debug) System.out.println(" Attempting to connect to registry via port number " + mn.portNumber);
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println("Messaging node built.");
 		} catch (IOException e) {
 			System.out.println(e);
+		} catch (NumberFormatException nfe) {
+			System.out.println(nfe);
 		}
 
 	}
