@@ -1,10 +1,10 @@
 package overlay.node;
 
-import java.net.ServerSocket;
-import java.net.Socket;
+public abstract class Node {
 
-public interface Node {
-
-	public String ipAddress = "";
+	public String hostname = "";
 	public int portNumber = 0;
+	public int id = -1;
+	public boolean debug = true;
+	
 }
