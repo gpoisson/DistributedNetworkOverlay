@@ -31,7 +31,7 @@ public class MessagingNode extends Node {
 			if (mn.debug) System.out.println(" Attempting to connect to registry via port number " + mn.portNumber);
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println(" Connection successfully established. Preparing to send registration request...");
-			mn.sender = new TCPSender(mn.socket);
+			mn.sender = new TCPSender(mn.socket, mn.debug);
 			mn.register();
 			if (mn.debug) System.out.println("Messaging node built.");
 			
