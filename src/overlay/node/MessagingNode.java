@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
+import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.wireformats.Register;
 
@@ -32,6 +33,8 @@ public class MessagingNode extends Node {
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println(" Connection successfully established. Preparing to send registration request...");
 			mn.sender = new TCPSender(mn.socket, mn.debug);
+			mn.receiver = new Thread(new TCPReceiverThread(mn.socket, mn.debug));
+			mn.receiver.start();
 			mn.register();
 			if (mn.debug) System.out.println("Messaging node built.");
 			

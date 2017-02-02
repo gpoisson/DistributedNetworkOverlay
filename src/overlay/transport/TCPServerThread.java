@@ -11,6 +11,7 @@ public class TCPServerThread implements Runnable {
 	private ArrayList<Socket> messagingNodes;
 	private int portnumber;
 	private boolean debug = false;
+	private boolean shutDown = false;
 	
 	public TCPServerThread(ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
 		this.messagingNodes = messagingNodes;
@@ -22,14 +23,16 @@ public class TCPServerThread implements Runnable {
 	public void run() {
 		if (debug) System.out.println(" TCPServerThread running in a new thread.");
 		try {
-			serverSocket = new ServerSocket(portnumber);
-			if (debug) System.out.println(" TCPServerThread awaiting new connection on port number " + serverSocket.getLocalPort());
-			Socket newSocket = serverSocket.accept();
-			messagingNodes.add(newSocket);
-			if (debug) System.out.println(" TCPServerThread connected to new client.");
-			if (debug) System.out.println(" TCPServerThread is spawning a TCPReceiverThread to listen for incoming data...");
-			Thread receiver = new Thread(new TCPReceiverThread(newSocket, debug));
-			receiver.start();
+			while (!shutDown) {
+				serverSocket = new ServerSocket(portnumber);
+				if (debug) System.out.println(" TCPServerThread awaiting new connection on port number " + serverSocket.getLocalPort());
+				Socket newSocket = serverSocket.accept();
+				messagingNodes.add(newSocket);
+				if (debug) System.out.println(" TCPServerThread connected to new client.");
+				if (debug) System.out.println(" TCPServerThread is spawning a TCPReceiverThread to listen for incoming data...");
+				Thread receiver = new Thread(new TCPReceiverThread(newSocket, debug));
+				receiver.start();
+			}
 		} catch (IOException e) {
 			System.out.println(e);
 		}
