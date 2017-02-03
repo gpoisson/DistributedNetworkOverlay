@@ -19,6 +19,11 @@ public class TCPReceiverThread implements Runnable {
 	private final int REGISTER = 0;
 	private final int REGISTER_RESPONSE = 1;
 	private final int DEREGISTER = 2;
+	private final int MESSAGING_NODES_LIST = 3;
+	private final int LINK_WEIGHTS = 4;
+	private final int TASK_INITIATE = 5;
+	private final int TASK_COMPLETE = 6;
+	private final int PULL_TRAFFIC_SUMMARY = 7;
 	
 	// TCPReceiverThread maintains a reference to the node's TCPSender thread,
 	//    in order to send response messages when appropriate.
