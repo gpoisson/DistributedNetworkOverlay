@@ -14,7 +14,7 @@ public class TCPSender {
 		this.debug = debug;
 		if (debug) System.out.println("  TCPSender created.");
 		this.socket = socket;
-		dout = new DataOutputStream(socket.getOutputStream());
+		dout = new DataOutputStream(this.socket.getOutputStream());
 	}
 	
 	public void sendData(byte[] dataToSend) throws IOException {
