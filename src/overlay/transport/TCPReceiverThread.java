@@ -7,6 +7,7 @@ import java.net.SocketException;
 
 import overlay.wireformats.Message;
 import overlay.wireformats.Register;
+import overlay.wireformats.RegisterResponse;
 
 public class TCPReceiverThread implements Runnable {
 
@@ -16,10 +17,14 @@ public class TCPReceiverThread implements Runnable {
 	private boolean debug;
 	
 	private final int REGISTER = 0;
-	private final int DEREGISTER = 1;
+	private final int REGISTER_RESPONSE = 1;
+	private final int DEREGISTER = 2;
 	
+	// TCPReceiverThread maintains a reference to the node's TCPSender thread,
+	//    in order to send response messages when appropriate.
 	public TCPReceiverThread(TCPSender sender, Socket socket, boolean debug) throws IOException {
 		this.socket = socket;
+		this.sender = sender;
 		this.debug = debug;
 		din = new DataInputStream(socket.getInputStream());
 	}
@@ -57,14 +62,24 @@ public class TCPReceiverThread implements Runnable {
 		String[] msgFields = str.split(" ");
 		int msgType = Integer.parseInt(msgFields[0]);
 		
-		// Register message
+		// Register message (Registry only)
 		if (msgType == REGISTER) {
 			if (debug) System.out.println("  TCPReceiver received REGISTER message...");
-			
+			RegisterResponse rrMsg = new RegisterResponse();
+			try {
+				sender.sendData(rrMsg.getByteArray());
+			} catch (IOException ioe) {
+				System.out.println(ioe);
+			}
+		}
+		// Register Response message (Messaging Node only)
+		else if (msgType == REGISTER_RESPONSE) {
+			if (debug) System.out.println("  TCPReceiver received REGISTER_RESPONSE message...");
 		}
 		else if (msgType == DEREGISTER) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER message...");
 		}
+		
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");
 		}
