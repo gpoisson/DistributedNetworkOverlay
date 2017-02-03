@@ -47,6 +47,9 @@ public class Registry extends Node {
 			else if (input[0].equals("list-messaging") && input[1].equals("nodes")) {			// "list-messaging nodes"
 				// Print information about all messaging nodes on separate lines  (hostname, port number)
 				if (reg.debug) System.out.println("Messaging Node manifest:");
+				for (int i = 0; i < reg.messagingNodes.size(); i++) {
+					System.out.println(reg.messagingNodes.get(i).toString());
+				}
 			}
 			else if (input[0].equals("list-weights")) {				
 				// List information about links composing the overlay

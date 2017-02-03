@@ -7,4 +7,8 @@ public abstract class Node {
 	public int id = -1;
 	public boolean debug = true;
 	
+	public String toString() {
+		return "Host: " + hostname + "\tPort: " + portNumber;
+	}
+	
 }
