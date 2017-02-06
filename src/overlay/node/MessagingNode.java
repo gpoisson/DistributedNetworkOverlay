@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
+import overlay.wireformats.Deregister;
 import overlay.wireformats.Register;
 
 public class MessagingNode extends Node {
@@ -52,9 +53,9 @@ public class MessagingNode extends Node {
 				}
 				else if (input[0].equals("exit-overlay")) {
 					// Deregister and shut down
+					mn.deregister();
 					if (mn.debug) System.out.println("Exiting overlay and shutting down.");
-					
-					System.exit(0);
+					//System.exit(0);
 				}
 			}
 			
@@ -72,6 +73,18 @@ public class MessagingNode extends Node {
 			if (debug) System.out.println(" Transmitting registration request...");
 			sender.sendData(registerMessage.getByteArray());
 			if (debug) System.out.println(" Registration request sent. Awaiting registration response...");
+		} catch (IOException ioe) {
+			System.out.println(ioe);
+		}
+	}
+	
+	// Deregister from Registry Node
+	private void deregister() {
+		Deregister deregisterMessage = new Deregister();
+		try {
+			if (debug) System.out.println(" Transmitting deregistration request...");
+			sender.sendData(deregisterMessage.getByteArray());
+			if (debug) System.out.println(" Deregister request sent.");
 		} catch (IOException ioe) {
 			System.out.println(ioe);
 		}
