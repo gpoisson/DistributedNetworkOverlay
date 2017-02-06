@@ -1,5 +1,7 @@
 package overlay.node;
 
+import overlay.wireformats.Message;
+
 public abstract class Node {
 
 	public String hostname = "";
@@ -9,6 +11,10 @@ public abstract class Node {
 	
 	public String toString() {
 		return "Host: " + hostname + "\tPort: " + portNumber;
+	}
+	
+	public void register(String[] msgFields) {
+		// Registry overrides this method
 	}
 	
 }

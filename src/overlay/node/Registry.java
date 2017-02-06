@@ -8,6 +8,7 @@ import java.util.Scanner;
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
+import overlay.wireformats.Message;
 
 public class Registry extends Node {
 
@@ -15,6 +16,8 @@ public class Registry extends Node {
 	public TCPSender sender;
 	public Thread receiver;
 	public ArrayList<Socket> messagingNodes;
+	public ArrayList<NodeReference> nodeRefs;
+	private int uniqueNodeId = 1;		// This values is only ever incremented, never decremented, to ensure ID numbers are unique.
 	
 	public Registry() {
 		if (debug) System.out.println("Building registry node...");
@@ -24,13 +27,26 @@ public class Registry extends Node {
 		
 		// Storage for sockets used to connect to Messaging Nodes
 		messagingNodes = new ArrayList<Socket>();
+		
+		// Storage for node data
+		nodeRefs = new ArrayList<NodeReference>();
+	}
+	
+	@Override
+	public void register(String[] msgFields) {
+		if (debug) System.out.println(" Registering new node: ");
+		NodeReference newNode = new NodeReference();
+		newNode.setId(uniqueNodeId);
+		uniqueNodeId++;
+		if (debug) System.out.println("   Incoming node IP: " + msgFields[2]);
+		nodeRefs.add(newNode);
 	}
 	
 	public static void main(String[] args) {
 		Registry reg = new Registry();
 		
 		// Spawn a server thread to listen for incoming connections and add them to messagingNodes
-		reg.server = new Thread(new TCPServerThread(reg.messagingNodes, reg.portNumber, reg.debug));
+		reg.server = new Thread(new TCPServerThread(reg, reg.messagingNodes, reg.portNumber, reg.debug));
 		reg.server.start();
 		
 		if (reg.debug) System.out.println("Registry node built. Awaiting user input.");

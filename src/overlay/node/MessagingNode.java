@@ -34,7 +34,7 @@ public class MessagingNode extends Node {
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println(" Connection successfully established. Preparing to send registration request...");
 			mn.sender = new TCPSender(mn.socket, mn.debug);
-			mn.receiver = new Thread(new TCPReceiverThread(mn.sender, mn.socket, mn.debug));
+			mn.receiver = new Thread(new TCPReceiverThread(mn, mn.sender, mn.socket, mn.debug));
 			mn.receiver.start();
 			mn.register();
 			if (mn.debug) System.out.println("Messaging node built.");
@@ -68,7 +68,7 @@ public class MessagingNode extends Node {
 	
 	// Register with the Registry Node
 	private void register() {
-		Register registerMessage = new Register();
+		Register registerMessage = new Register(this.socket.getInetAddress().toString(), this.socket.getPort());
 		try {
 			if (debug) System.out.println(" Transmitting registration request...");
 			sender.sendData(registerMessage.getByteArray());

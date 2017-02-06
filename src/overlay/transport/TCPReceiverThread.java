@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import overlay.node.Node;
 import overlay.wireformats.Message;
 import overlay.wireformats.Register;
 import overlay.wireformats.RegisterResponse;
 
 public class TCPReceiverThread implements Runnable {
 
+	private Node parent;
 	private Socket socket;
 	private TCPSender sender;
 	private DataInputStream din;
@@ -27,7 +29,8 @@ public class TCPReceiverThread implements Runnable {
 	
 	// TCPReceiverThread maintains a reference to the node's TCPSender thread,
 	//    in order to send response messages when appropriate.
-	public TCPReceiverThread(TCPSender sender, Socket socket, boolean debug) throws IOException {
+	public TCPReceiverThread(Node parent, TCPSender sender, Socket socket, boolean debug) throws IOException {
+		this.parent = parent;
 		this.socket = socket;
 		this.sender = sender;
 		this.debug = debug;
@@ -71,6 +74,7 @@ public class TCPReceiverThread implements Runnable {
 		if (msgType == REGISTER) {
 			if (debug) System.out.println("  TCPReceiver received REGISTER message...");
 			RegisterResponse rrMsg = new RegisterResponse();
+			parent.register(msgFields);
 			try {
 				sender.sendData(rrMsg.getByteArray());
 			} catch (IOException ioe) {

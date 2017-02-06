@@ -5,15 +5,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import overlay.node.Node;
+
 public class TCPServerThread implements Runnable {
 	
 	private ServerSocket serverSocket;
 	private ArrayList<Socket> messagingNodes;
 	private int portnumber;
+	private Node parent;
 	private boolean debug = false;
 	public boolean shutDown = false;
 	
-	public TCPServerThread(ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
+	public TCPServerThread(Node parent, ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
+		this.parent = parent;
 		this.messagingNodes = messagingNodes;
 		this.portnumber = portnumber;
 		this.debug = debug;
@@ -31,7 +35,7 @@ public class TCPServerThread implements Runnable {
 				if (debug) System.out.println(" TCPServerThread connected to new client.");
 				if (debug) System.out.println(" TCPServerThread is spawning a TCPReceiverThread to listen for incoming data...");
 				TCPSender sender = new TCPSender(newSocket, debug);
-				Thread receiver = new Thread(new TCPReceiverThread(sender, newSocket, debug));
+				Thread receiver = new Thread(new TCPReceiverThread(parent, sender, newSocket, debug));
 				receiver.start();
 			}
 		} catch (IOException e) {
