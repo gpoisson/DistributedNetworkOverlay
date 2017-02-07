@@ -44,5 +44,14 @@ public class TCPServerThread implements Runnable {
 		
 		if (debug) System.out.println(" TCPServerThread exiting.");
 	}
+	
+	public void shutDown() {
+		shutDown = true;
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			if (debug) System.out.println(" Server socket closed.");
+		}
+	}
 
 }

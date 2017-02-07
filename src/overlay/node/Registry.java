@@ -15,13 +15,13 @@ import overlay.wireformats.MessagingNodesList;
 public class Registry extends Node {
 
 	public Thread server;
+	public TCPServerThread serverThread;
 	public TCPSender sender;
 	public Thread receiver;
 	public ArrayList<Socket> messagingNodes;
 	public ArrayList<NodeReference> nodeRefs;
 	private int uniqueNodeId = 1;		// This values is only ever incremented, never decremented, to ensure ID numbers are unique.
 	private OverlayCreator overlayCreator;
-	private int linksPerNode = 4;
 	
 	public Registry() {
 		if (debug) System.out.println("Building registry node...");
@@ -34,8 +34,6 @@ public class Registry extends Node {
 		
 		// Storage for node data
 		nodeRefs = new ArrayList<NodeReference>();
-		
-		overlayCreator = new OverlayCreator(nodeRefs, linksPerNode);
 	}
 	
 	@Override
@@ -71,7 +69,8 @@ public class Registry extends Node {
 		Registry reg = new Registry();
 		
 		// Spawn a server thread to listen for incoming connections and add them to messagingNodes
-		reg.server = new Thread(new TCPServerThread(reg, reg.messagingNodes, reg.portNumber, reg.debug));
+		reg.serverThread = new TCPServerThread(reg, reg.messagingNodes, reg.portNumber, reg.debug);
+		reg.server = new Thread(reg.serverThread);
 		reg.server.start();
 		
 		if (reg.debug) System.out.println("Registry node built. Awaiting user input.");
@@ -98,7 +97,10 @@ public class Registry extends Node {
 			else if (input[0].equals("setup-overlay")) {			
 				// Set up the overlay; each messaging node gets <numConnections> links
 				int numConnections = Integer.parseInt(input[1]);
+				reg.serverThread.shutDown();
 				if (reg.debug) System.out.println("Setting up overlay with " + numConnections + " links between nodes...");
+				MessagingNodesList mnList = new MessagingNodesList(reg.nodeRefs);
+				reg.overlayCreator = new OverlayCreator(mnList, numConnections);
 			}
 			else if (input[0].equals("send-overlay-link-weights")) {		
 				// Send a Link_Weights message to all registered nodes
