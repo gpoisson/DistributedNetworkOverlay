@@ -6,8 +6,10 @@ import overlay.node.NodeReference;
 
 public class MessagingNodesList extends Message {
 
+	public ArrayList<NodeReference> nodeRefs;
 	public MessagingNodesList(ArrayList<NodeReference> nodeRefs) {
 		type = 3;
+		this.nodeRefs = nodeRefs;
 	}
 	
 	public String toString() {
