@@ -8,7 +8,9 @@ import java.util.Scanner;
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
+import overlay.util.OverlayCreator;
 import overlay.wireformats.Message;
+import overlay.wireformats.MessagingNodesList;
 
 public class Registry extends Node {
 
@@ -18,6 +20,8 @@ public class Registry extends Node {
 	public ArrayList<Socket> messagingNodes;
 	public ArrayList<NodeReference> nodeRefs;
 	private int uniqueNodeId = 1;		// This values is only ever incremented, never decremented, to ensure ID numbers are unique.
+	private OverlayCreator overlayCreator;
+	private int linksPerNode = 4;
 	
 	public Registry() {
 		if (debug) System.out.println("Building registry node...");
@@ -30,6 +34,8 @@ public class Registry extends Node {
 		
 		// Storage for node data
 		nodeRefs = new ArrayList<NodeReference>();
+		
+		overlayCreator = new OverlayCreator(nodeRefs, linksPerNode);
 	}
 	
 	@Override
@@ -82,9 +88,8 @@ public class Registry extends Node {
 			else if (input[0].equals("list-messaging") && input[1].equals("nodes")) {			// "list-messaging nodes"
 				// Print information about all messaging nodes on separate lines  (hostname, port number)
 				if (reg.debug) System.out.println("Messaging Node manifest:");
-				for (int i = 0; i < reg.messagingNodes.size(); i++) {
-					System.out.println(reg.messagingNodes.get(i).toString());
-				}
+				MessagingNodesList mnList = new MessagingNodesList(reg.nodeRefs);
+				System.out.println(mnList.toString());
 			}
 			else if (input[0].equals("list-weights")) {				
 				// List information about links composing the overlay

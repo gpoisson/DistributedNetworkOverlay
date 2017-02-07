@@ -2,6 +2,7 @@ package overlay.node;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import overlay.transport.TCPReceiverThread;
@@ -14,10 +15,11 @@ public class MessagingNode extends Node {
 	public Socket socket;			// Socket used for transmitting data
 	public TCPSender sender;		// Marshalling of messages into byte[] prior to transmission
 	public Thread receiver;			// Receiver thread listens for incoming connections 
+	public ArrayList<NodeReference> neighbors;
 	
 	public MessagingNode() {
 		if (debug) System.out.println("Building messaging node...");
-		
+		neighbors = new ArrayList<NodeReference>();
 	}
 
 	public static void main(String[] args) {
