@@ -19,4 +19,8 @@ public class NodeReference {
 	public void setId(int id) {
 		this.id = id;
 	}
+	public String getIP() { return this.ipAddress; }
+	public int getLocalPort() { return this.localPort; }
+	public int getPublicPort() { return this.publicPort; }
+	public int getId() { return this.id; }
 }

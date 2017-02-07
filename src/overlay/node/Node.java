@@ -17,4 +17,8 @@ public abstract class Node {
 		// Registry overrides this method
 	}
 	
+	public void deregister(String[] msgFields) {
+		// Registry overrides this method
+	}
+	
 }

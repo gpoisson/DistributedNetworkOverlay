@@ -37,9 +37,28 @@ public class Registry extends Node {
 		if (debug) System.out.println(" Registering new node: ");
 		NodeReference newNode = new NodeReference();
 		newNode.setId(uniqueNodeId);
+		newNode.setIP(msgFields[2]);
+		newNode.setLocalPort(Integer.parseInt(msgFields[3]));
+		newNode.setPublicPort(this.portNumber);
 		uniqueNodeId++;
-		if (debug) System.out.println("   Incoming node IP: " + msgFields[2]);
+		if (debug) System.out.println("   Incoming node IP: " + newNode.getIP());
+		if (debug) System.out.println("   Incoming node local port: " + newNode.getLocalPort());
+		if (debug) System.out.println("   Incoming node public port: " + newNode.getPublicPort());
+		if (debug) System.out.println("   Incoming node ID: " + newNode.getId());
 		nodeRefs.add(newNode);
+		if (debug) System.out.println(" There are now " + nodeRefs.size() + " nodes registered.");
+	}
+	
+	@Override
+	public void deregister(String[] msgFields) {
+		int nodeId = Integer.parseInt(msgFields[0]);
+		if (debug) System.out.println(" Deregistering node: " + nodeId);
+		for (int i = 0; i < nodeRefs.size(); i++) {
+			if (nodeRefs.get(i).getId() == nodeId) {
+				nodeRefs.remove(i);
+				if (debug) System.out.println(" Deregistration successful.");
+			}
+		}
 	}
 	
 	public static void main(String[] args) {

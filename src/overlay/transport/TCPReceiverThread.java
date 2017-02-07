@@ -87,6 +87,7 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == DEREGISTER) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER message...");
+			parent.deregister(msgFields);
 		}
 		
 		else {
