@@ -9,6 +9,10 @@ public class NodeReference {
 	private int publicPort;
 	private int id;
 	public ArrayList<LinkWeight> neighbors;
+	
+	public NodeReference() {
+		neighbors = new ArrayList<LinkWeight>();
+	}
 
 	public void setIP(String ipAddress) {
 		this.ipAddress = ipAddress;
