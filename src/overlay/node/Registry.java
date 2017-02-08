@@ -96,6 +96,7 @@ public class Registry extends Node {
 			else if (input[0].equals("list-weights")) {				
 				// List information about links composing the overlay
 				if (reg.debug) System.out.println("Node link manifest:");
+				System.out.println(reg.mnList.toString());
 			}
 			else if (input[0].equals("setup-overlay")) {			
 				// Set up the overlay; each messaging node gets <numConnections> links

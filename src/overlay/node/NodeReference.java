@@ -26,6 +26,13 @@ public class NodeReference {
 	public void setId(int id) {
 		this.id = id;
 	}
+	public String toString() {
+		String msg = "IP: " + ipAddress + "\tLocal Port: " + localPort + "\tPublic Port: " + publicPort + "\tID num: " + id + "\n\tNeighbor nodes: ";
+		for (int i = 0; i < neighbors.size(); i++) {
+			msg += "\n\t\tID num: " + neighbors.get(i).id + "\tWeight: " + neighbors.get(i).weight;
+		}
+		return msg;
+	}
 	public String getIP() { return this.ipAddress; }
 	public int getLocalPort() { return this.localPort; }
 	public int getPublicPort() { return this.publicPort; }

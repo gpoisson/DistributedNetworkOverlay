@@ -16,7 +16,10 @@ public class MessagingNodesList extends Message {
 	
 	public String toString() {
 		String mnList = "MESSAGING_NODES_LIST:\n";
-		
+		mnList += "Number of peer messaging nodes: " + peerCount + "\n";
+		for (int i = 0; i < nodeRefs.size(); i++) {
+			mnList += "Messaging node" + nodeRefs.get(i).getId() + " " + nodeRefs.get(i).toString() + "\n"; 
+		}
 		return mnList;
 	}
 	
