@@ -18,9 +18,11 @@ public class OverlayCreator {
 		this.linksPerNode = linksPerNode;
 		this.nodeRefs = mnList.nodeRefs;
 		this.debug = debug;
+		if (this.debug) System.out.println("OverlayCreator instantiated in the Registry.");
 	}
 
 	public void buildOverlay() {
+		if (debug) System.out.println(" Registry OverlayCreator preparing to build overlay for " + numNodes + " nodes with " + linksPerNode + " links each.");
 		
 	}
 }

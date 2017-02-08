@@ -1,11 +1,14 @@
 package overlay.node;
 
+import java.util.ArrayList;
+
 public class NodeReference {
 	
 	private String ipAddress;
 	private int localPort;
 	private int publicPort;
 	private int id;
+	public ArrayList<Integer> neighbors;
 
 	public void setIP(String ipAddress) {
 		this.ipAddress = ipAddress;

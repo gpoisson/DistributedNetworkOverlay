@@ -39,18 +39,18 @@ public class TCPServerThread implements Runnable {
 				receiver.start();
 			}
 		} catch (IOException e) {
-			System.out.println(e);
+			System.out.println(" Server socket closed.");
 		}
 		
 		if (debug) System.out.println(" TCPServerThread exiting.");
 	}
 	
 	public void shutDown() {
-		shutDown = true;
 		try {
+			shutDown = true;
 			serverSocket.close();
 		} catch (IOException e) {
-			if (debug) System.out.println(" Server socket closed.");
+			if (debug) System.out.println(e);
 		}
 	}
 

@@ -7,7 +7,7 @@ import overlay.node.NodeReference;
 public class MessagingNodesList extends Message {
 
 	public ArrayList<NodeReference> nodeRefs;
-	public int peerCount;
+	public int peerCount;									// Number of immediate neighbors to each node
 	
 	public MessagingNodesList(ArrayList<NodeReference> nodeRefs) {
 		type = 3;
