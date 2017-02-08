@@ -96,7 +96,10 @@ public class Registry extends Node {
 			}
 			else if (input[0].equals("setup-overlay")) {			
 				// Set up the overlay; each messaging node gets <numConnections> links
-				int numConnections = Integer.parseInt(input[1]);
+				int numConnections = 4;
+				if (input.length > 1) {
+					numConnections = Integer.parseInt(input[1]); 
+				}
 				reg.serverThread.shutDown();
 				if (reg.debug) System.out.println("Setting up overlay with " + numConnections + " links between nodes...");
 				MessagingNodesList mnList = new MessagingNodesList(reg.nodeRefs);
