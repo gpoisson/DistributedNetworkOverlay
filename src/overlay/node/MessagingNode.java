@@ -56,8 +56,6 @@ public class MessagingNode extends Node {
 				else if (input[0].equals("exit-overlay")) {
 					// Deregister and shut down
 					mn.deregister();
-					if (mn.debug) System.out.println("Exiting overlay.");
-					//System.exit(0);
 				}
 			}
 			

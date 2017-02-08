@@ -8,7 +8,7 @@ public class NodeReference {
 	private int localPort;
 	private int publicPort;
 	private int id;
-	public ArrayList<Integer> neighbors;
+	public ArrayList<LinkWeight> neighbors;
 
 	public void setIP(String ipAddress) {
 		this.ipAddress = ipAddress;
