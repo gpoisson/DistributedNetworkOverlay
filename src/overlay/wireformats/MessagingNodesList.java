@@ -7,6 +7,8 @@ import overlay.node.NodeReference;
 public class MessagingNodesList extends Message {
 
 	public ArrayList<NodeReference> nodeRefs;
+	public int peerCount;
+	
 	public MessagingNodesList(ArrayList<NodeReference> nodeRefs) {
 		type = 3;
 		this.nodeRefs = nodeRefs;
@@ -16,5 +18,9 @@ public class MessagingNodesList extends Message {
 		String mnList = "MESSAGING_NODES_LIST:\n";
 		
 		return mnList;
+	}
+	
+	public void setPeerCount(int peerCount) {
+		this.peerCount = peerCount;
 	}
 }

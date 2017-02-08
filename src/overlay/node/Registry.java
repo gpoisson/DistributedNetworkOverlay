@@ -22,6 +22,7 @@ public class Registry extends Node {
 	public ArrayList<NodeReference> nodeRefs;
 	private int uniqueNodeId = 1;		// This values is only ever incremented, never decremented, to ensure ID numbers are unique.
 	private OverlayCreator overlayCreator;
+	public MessagingNodesList mnList;
 	
 	public Registry() {
 		if (debug) System.out.println("Building registry node...");
@@ -34,6 +35,9 @@ public class Registry extends Node {
 		
 		// Storage for node data
 		nodeRefs = new ArrayList<NodeReference>();
+		
+		// Maintain the Messaging Nodes List
+		mnList = new MessagingNodesList(nodeRefs);
 	}
 	
 	@Override
@@ -87,8 +91,7 @@ public class Registry extends Node {
 			else if (input[0].equals("list-messaging") && input[1].equals("nodes")) {			// "list-messaging nodes"
 				// Print information about all messaging nodes on separate lines  (hostname, port number)
 				if (reg.debug) System.out.println("Messaging Node manifest:");
-				MessagingNodesList mnList = new MessagingNodesList(reg.nodeRefs);
-				System.out.println(mnList.toString());
+				System.out.println(reg.mnList.toString());
 			}
 			else if (input[0].equals("list-weights")) {				
 				// List information about links composing the overlay
@@ -96,17 +99,19 @@ public class Registry extends Node {
 			}
 			else if (input[0].equals("setup-overlay")) {			
 				// Set up the overlay; each messaging node gets <numConnections> links
+				// Executed before the "send-overlay-link-weights" command
 				int numConnections = 4;
 				if (input.length > 1) {
 					numConnections = Integer.parseInt(input[1]); 
 				}
 				reg.serverThread.shutDown();
 				if (reg.debug) System.out.println("Setting up overlay with " + numConnections + " links between nodes...");
-				MessagingNodesList mnList = new MessagingNodesList(reg.nodeRefs);
-				reg.overlayCreator = new OverlayCreator(mnList, numConnections);
+				reg.overlayCreator = new OverlayCreator(reg.mnList, numConnections, reg.debug);
+				reg.overlayCreator.buildOverlay();
 			}
 			else if (input[0].equals("send-overlay-link-weights")) {		
 				// Send a Link_Weights message to all registered nodes
+				// Executed after the "setup-overlay" command
 				if (reg.debug) System.out.println("Sending Link_Weights message to all registered nodes...");
 			}
 			else if (input[0].equals("start")) {
