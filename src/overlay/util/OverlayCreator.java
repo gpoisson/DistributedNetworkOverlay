@@ -5,7 +5,6 @@ import java.util.Random;
 
 import overlay.node.LinkWeight;
 import overlay.node.NodeReference;
-import overlay.wireformats.LinkWeights;
 import overlay.wireformats.MessagingNodesList;
 
 public class OverlayCreator {

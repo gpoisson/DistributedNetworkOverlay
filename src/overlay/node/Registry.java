@@ -5,11 +5,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
 import overlay.util.OverlayCreator;
-import overlay.wireformats.Message;
+import overlay.wireformats.LinkWeights;
 import overlay.wireformats.MessagingNodesList;
 
 public class Registry extends Node {
@@ -114,6 +113,15 @@ public class Registry extends Node {
 				// Send a Link_Weights message to all registered nodes
 				// Executed after the "setup-overlay" command
 				if (reg.debug) System.out.println("Sending Link_Weights message to all registered nodes...");
+				LinkWeights lwMsg = new LinkWeights(reg.mnList);
+				try {
+					for (int node_index = 0; node_index < reg.messagingNodes.size(); node_index++) {
+						TCPSender sender = new TCPSender(reg.messagingNodes.get(node_index), reg.debug);
+						sender.sendData(lwMsg.getByteArray());
+					}
+				} catch (IOException ioe) {
+					System.out.println(ioe);
+				}
 			}
 			else if (input[0].equals("start")) {
 				// Nodes exchange <numRounds> messages

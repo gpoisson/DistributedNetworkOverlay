@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import overlay.node.Node;
-import overlay.wireformats.Message;
-import overlay.wireformats.Register;
 import overlay.wireformats.RegisterResponse;
 
 public class TCPReceiverThread implements Runnable {
@@ -89,7 +87,21 @@ public class TCPReceiverThread implements Runnable {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER message...");
 			parent.deregister(msgFields);
 		}
-		
+		else if (msgType == MESSAGING_NODES_LIST) {
+			if (debug) System.out.println("  TCPReceiver received MESSAGING_NODES_LIST message...");
+		}
+		else if (msgType == LINK_WEIGHTS) {
+			if (debug) System.out.println("  TCPReceiver received LINK_WEIGHTS message...");
+		}
+		else if (msgType == TASK_INITIATE) {
+			if (debug) System.out.println("  TCPReceiver received TASK_INITIATE message...");
+		}
+		else if (msgType == TASK_COMPLETE) {
+			if (debug) System.out.println("  TCPReceiver received TASK_COMPLETE message...");
+		}
+		else if (msgType == PULL_TRAFFIC_SUMMARY) {
+			if (debug) System.out.println("  TCPReceiver received PULL_TRAFFIC_SUMMARY message...");
+		}
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");
 		}
