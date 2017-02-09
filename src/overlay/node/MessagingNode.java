@@ -8,6 +8,7 @@ import java.util.Scanner;
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.wireformats.Deregister;
+import overlay.wireformats.PayloadMessage;
 import overlay.wireformats.Register;
 
 public class MessagingNode extends Node {
@@ -88,6 +89,13 @@ public class MessagingNode extends Node {
 		} catch (IOException ioe) {
 			System.out.println(ioe);
 		}
+	}
+	
+	public void transmitMessages(int numRounds) {
+		PayloadMessage pMsg = new PayloadMessage();
+		// For each round, choose a random external node
+		// Compute routing plan, encode into message
+		// Generate random payload and transmit
 	}
 
 	public static void usage() {

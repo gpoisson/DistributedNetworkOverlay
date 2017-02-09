@@ -12,6 +12,7 @@ import overlay.util.OverlayCreator;
 import overlay.wireformats.DeregisterResponse;
 import overlay.wireformats.LinkWeights;
 import overlay.wireformats.MessagingNodesList;
+import overlay.wireformats.TaskInitiate;
 
 public class Registry extends Node {
 
@@ -168,7 +169,21 @@ public class Registry extends Node {
 			else if (input[0].equals("start")) {
 				// Nodes exchange <numRounds> messages
 				int numRounds = Integer.parseInt(input[1]);
-				if (reg.debug) System.out.println("Directing all nodes to send " + numRounds + " messages to each other...");
+				if (numRounds < 0) {
+					System.out.println("Argument <number-of-rounds> must be a non-negative integer.");
+				}
+				else {
+					if (reg.debug) System.out.println("Directing all nodes to send " + numRounds + " messages to each other...");
+					TaskInitiate tiMsg = new TaskInitiate(numRounds);
+					
+					for (int node_index = 0; node_index < reg.nodeSenders.size(); node_index++) {
+						try {
+							reg.nodeSenders.get(node_index).sendData(tiMsg.getByteArray());
+						} catch (IOException ioe) {
+							System.out.println(ioe);
+						}
+					}
+				}
 			}
 		}
 	}

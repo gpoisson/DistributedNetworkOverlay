@@ -26,6 +26,7 @@ public class TCPReceiverThread implements Runnable {
 	private final int TASK_INITIATE = 6;
 	private final int TASK_COMPLETE = 7;
 	private final int PULL_TRAFFIC_SUMMARY = 8;
+	private final int PAYLOAD_MESSAGE = 9;
 	
 	// TCPReceiverThread maintains a reference to the node's TCPSender thread,
 	//    in order to send response messages when appropriate.
