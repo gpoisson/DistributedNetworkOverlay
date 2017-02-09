@@ -10,7 +10,7 @@ public class MessagingNodesList extends Message {
 	public int peerCount;									// Number of immediate neighbors to each node
 	
 	public MessagingNodesList(ArrayList<NodeReference> nodeRefs) {
-		type = 3;
+		type = 4;
 		this.nodeRefs = nodeRefs;
 	}
 	
