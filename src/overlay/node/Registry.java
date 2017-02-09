@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
 import overlay.util.OverlayCreator;
@@ -19,6 +20,8 @@ public class Registry extends Node {
 	public Thread receiver;
 	public ArrayList<Socket> messagingNodes;
 	public ArrayList<NodeReference> nodeRefs;
+	public ArrayList<TCPSender> nodeSenders;
+	public ArrayList<Thread> nodeReceivers;
 	private int uniqueNodeId = 1;		// This values is only ever incremented, never decremented, to ensure ID numbers are unique.
 	private OverlayCreator overlayCreator;
 	public MessagingNodesList mnList;
@@ -37,6 +40,10 @@ public class Registry extends Node {
 		
 		// Maintain the Messaging Nodes List
 		mnList = new MessagingNodesList(nodeRefs);
+		
+		// Storage for senders and receivers
+		nodeSenders = new ArrayList<TCPSender>();
+		nodeReceivers = new ArrayList<Thread>();
 	}
 	
 	@Override
@@ -112,15 +119,28 @@ public class Registry extends Node {
 			else if (input[0].equals("send-overlay-link-weights")) {		
 				// Send a Link_Weights message to all registered nodes
 				// Executed after the "setup-overlay" command
-				if (reg.debug) System.out.println("Sending Link_Weights message to all registered nodes...");
-				LinkWeights lwMsg = new LinkWeights(reg.mnList);
+				
+				// Populate a list of senders and receivers for all registered messaging nodes
 				try {
 					for (int node_index = 0; node_index < reg.messagingNodes.size(); node_index++) {
 						TCPSender sender = new TCPSender(reg.messagingNodes.get(node_index), reg.debug);
-						sender.sendData(lwMsg.getByteArray());
+						reg.nodeSenders.add(sender);
+						Thread receiver = new Thread(new TCPReceiverThread(reg, sender, reg.messagingNodes.get(node_index), reg.debug));
+						receiver.start();
+						reg.nodeReceivers.add(receiver);
 					}
 				} catch (IOException ioe) {
 					System.out.println(ioe);
+				}
+				if (reg.debug) System.out.println("Sending Link_Weights message to all registered nodes...");
+				LinkWeights lwMsg = new LinkWeights(reg.mnList);
+				
+				for (int node_index = 0; node_index < reg.nodeSenders.size(); node_index++) {
+					try {
+						reg.nodeSenders.get(node_index).sendData(lwMsg.getByteArray());
+					} catch (IOException ioe) {
+						System.out.println(ioe);
+					}
 				}
 			}
 			else if (input[0].equals("start")) {
