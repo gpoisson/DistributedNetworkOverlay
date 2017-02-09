@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import overlay.node.Node;
+import overlay.wireformats.DeregisterResponse;
 import overlay.wireformats.RegisterResponse;
 
 public class TCPReceiverThread implements Runnable {
@@ -90,6 +91,7 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == DEREGISTER_RESPONSE) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER_RESPONSE message...");
+			System.exit(0);
 		}
 		else if (msgType == MESSAGING_NODES_LIST) {
 			if (debug) System.out.println("  TCPReceiver received MESSAGING_NODES_LIST message...");

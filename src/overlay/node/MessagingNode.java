@@ -80,7 +80,7 @@ public class MessagingNode extends Node {
 	
 	// Deregister from Registry Node
 	private void deregister() {
-		Deregister deregisterMessage = new Deregister();
+		Deregister deregisterMessage = new Deregister(socket.getLocalAddress().toString(), socket.getPort());
 		try {
 			if (debug) System.out.println(" Transmitting deregistration request...");
 			sender.sendData(deregisterMessage.getByteArray());

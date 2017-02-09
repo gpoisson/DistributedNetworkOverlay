@@ -9,6 +9,7 @@ import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
 import overlay.util.OverlayCreator;
+import overlay.wireformats.DeregisterResponse;
 import overlay.wireformats.LinkWeights;
 import overlay.wireformats.MessagingNodesList;
 
@@ -65,14 +66,40 @@ public class Registry extends Node {
 	
 	@Override
 	public void deregister(String[] msgFields) {
-		int nodeId = Integer.parseInt(msgFields[0]);
-		if (debug) System.out.println(" Deregistering node: " + nodeId);
-		for (int i = 0; i < nodeRefs.size(); i++) {
-			if (nodeRefs.get(i).getId() == nodeId) {
-				nodeRefs.remove(i);
-				if (debug) System.out.println(" Deregistration successful.");
+		String nodeIP = msgFields[2];
+		int nodePort = Integer.parseInt(msgFields[3]);
+		if (debug) System.out.println(" Deregistering node: " + nodeIP + " " + nodePort);
+		for (int i = 0; i < messagingNodes.size(); i++) {
+			//System.out.println("Checking node ==> " + messagingNodes.get(i).getInetAddress().toString() + "  " + messagingNodes.get(i).getLocalPort());
+			
+			// THE PORT BEING REPORTED IN THE FOLLOWING IF STATEMENT DOESN'T MATCH THE PORT GIVEN BY THE MESSAGING NODE
+			
+			if (messagingNodes.get(i).getInetAddress().toString().equals(nodeIP) && messagingNodes.get(i).getPort() == nodePort) {
+				if (debug) System.out.println(" Deregistration successful. Sending deregister response.");
+				DeregisterResponse drrMsg = new DeregisterResponse();
+				try {
+					messagingNodes.get(i).getOutputStream().write(drrMsg.getByteArray());
+				} catch (IOException ioe) {
+					System.out.println(ioe);
+				}
 			}
 		}
+		/*for (int i = 0; i < nodeRefs.size(); i++) {
+			if (nodeRefs.get(i).getIP().contains(nodeIP)) {
+				if (debug) System.out.println(" Deregistration successful. Sending deregister response.");
+				DeregisterResponse drrMsg = new DeregisterResponse();
+				if (nodeRefs.get(i).getIP().contains("localhost")) { nodeIP = "localhost"; }
+				else { nodeIP = nodeRefs.get(i).getIP(); }
+				try {
+					Socket socket = new Socket(nodeIP, nodePort);
+					TCPSender sender = new TCPSender(socket, debug);
+					sender.sendData(drrMsg.getByteArray());
+				} catch (IOException ioe) {
+					System.out.println(ioe);
+				}
+				nodeRefs.remove(i);
+			}
+		}*/
 	}
 	
 	public static void main(String[] args) {

@@ -1,5 +1,7 @@
 package overlay.node;
 
+import overlay.wireformats.DeregisterResponse;
+
 public abstract class Node {
 
 	public String hostname = "";
