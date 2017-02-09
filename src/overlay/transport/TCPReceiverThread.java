@@ -53,7 +53,7 @@ public class TCPReceiverThread implements Runnable {
 				if (debug) System.out.println("  TCPReceiverThread received byte[]: " + str);
 				interpret(str);
 			} catch (SocketException se) {
-				System.out.println(se.getMessage());
+				if (debug) System.out.println("  TCPReceiverThread socket closed.");
 				break;
 			} catch (IOException ioe) {
 				System.out.println(ioe.getMessage());
@@ -91,6 +91,7 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == DEREGISTER_RESPONSE) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER_RESPONSE message...");
+			if (debug) System.out.println("Node shutting down...");
 			System.exit(0);
 		}
 		else if (msgType == MESSAGING_NODES_LIST) {
