@@ -19,7 +19,7 @@ public class OverlayCreator {
 		// Overlay Creator is given the list of messaging nodes
 		numNodes = mnList.nodeRefs.size();
 		this.linksPerNode = linksPerNode;
-		mnList.setPeerCount(linksPerNode);
+		mnList.setPeerCount(numNodes);
 		this.nodeRefs = mnList.nodeRefs;
 		this.mnList = mnList;
 		this.debug = debug;
@@ -38,7 +38,12 @@ public class OverlayCreator {
 			System.out.println("System contains only one node. No connections needed. Setting number of peer nodes to 0.");
 			mnList.setPeerCount(0);
 		}
-		else {
+		if (linksPerNode >= numNodes) {
+			System.out.println("Specified number of links is greater than the number of links supported by " + numNodes + " nodes.");
+			linksPerNode = numNodes - 1;
+			System.out.println("Number of links adjusted to max number supported by this system. Each node will have " + linksPerNode + " links.");
+		}
+		if (numNodes > 1) {
 			int index_of_node_with_fewest_links = 0;
 			int fewest_number_of_links;
 			int index_of_node_with_second_fewest_links = index_of_node_with_fewest_links + 1;

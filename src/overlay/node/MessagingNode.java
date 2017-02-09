@@ -94,7 +94,7 @@ public class MessagingNode extends Node {
 	public void transmitMessages(int numRounds) {
 		PayloadMessage pMsg = new PayloadMessage();
 		// For each round, choose a random external node
-		// Compute routing plan, encode into message
+		// Find routing plan in routing cache, encode into message
 		// Generate random payload and transmit
 	}
 

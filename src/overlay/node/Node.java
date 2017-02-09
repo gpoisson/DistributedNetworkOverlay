@@ -1,5 +1,6 @@
 package overlay.node;
 
+import overlay.dijkstra.RoutingCache;
 import overlay.wireformats.DeregisterResponse;
 
 public abstract class Node {
@@ -12,6 +13,7 @@ public abstract class Node {
 	protected int receiveTracker = 0;
 	protected int sendTracker = 0;
 	protected int relayTracker = 0;
+	public RoutingCache routingCache;
 	
 	public String toString() {
 		return "Host: " + hostname + "\tPort: " + portNumber;
