@@ -68,13 +68,13 @@ public class TCPReceiverThread implements Runnable {
 	}
 	
 	private void determineNodeId(String[] msgFields) {
-		if (debug) System.out.println("  Scanning messaging nodes list for ID number");
+		if (debug) System.out.println("  Scanning messaging nodes list for ID number.");
 		for (int wordIndex = 0; wordIndex < msgFields.length; wordIndex++) {
-			if (msgFields[wordIndex].equals("Messaging")) {
-				String ip = msgFields[wordIndex + 3];
-				int port = Integer.parseInt(msgFields[wordIndex + 6]);
-				if (parent.hostname.contains(ip) && parent.portNumber == port) {
-					parent.id = Integer.parseInt(msgFields[wordIndex + 12]);
+			if (msgFields[wordIndex].contains("Messaging")) {
+				String ip = msgFields[wordIndex + 3].split("\t")[0];
+				int port = Integer.parseInt(msgFields[wordIndex + 5].split("\t")[0]);
+				if (ip.contains(parent.hostname) && parent.portNumber == port) {
+					parent.id = Integer.parseInt(msgFields[wordIndex + 9].split("\t")[0]);
 				}
 			}
 		}
@@ -119,6 +119,7 @@ public class TCPReceiverThread implements Runnable {
 			determineNodeId(msgFields);
 			parent.routingCache = new RoutingCache();
 			ShortestPath pathCalculator = new ShortestPath(msgFields, parent.routingCache, parent.id);
+			parent.routingCache.dijkstraNodes = pathCalculator.findAllShortestPaths();
 		}
 		else if (msgType == TASK_INITIATE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_INITIATE message...");

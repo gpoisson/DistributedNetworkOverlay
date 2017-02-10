@@ -1,5 +1,6 @@
 package overlay.node;
 
+import overlay.dijkstra.DijkstraNode;
 import overlay.dijkstra.RoutingCache;
 import overlay.wireformats.DeregisterResponse;
 

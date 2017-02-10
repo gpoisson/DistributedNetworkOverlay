@@ -27,9 +27,9 @@ public class NodeReference {
 		this.id = id;
 	}
 	public String toString() {
-		String msg = "IP: " + ipAddress + "\tLocal Port: " + localPort + "\tPublic Port: " + publicPort + "\tID num: " + id + "\n\tNeighbor nodes: ";
+		String msg = "IP: " + ipAddress + "\tLocal Port: " + localPort + "\tPublic Port: " + publicPort + "\tID num: " + id + " \n    Neighbor nodes: ";
 		for (int i = 0; i < neighbors.size(); i++) {
-			msg += "\n\t\tID num: " + neighbors.get(i).id + "\tWeight: " + neighbors.get(i).weight;
+			msg += "\n    ID num: " + neighbors.get(i).id + "    Weight: " + neighbors.get(i).weight;
 		}
 		return msg;
 	}
