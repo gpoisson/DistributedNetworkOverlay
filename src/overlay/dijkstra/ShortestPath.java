@@ -45,6 +45,53 @@ public class ShortestPath {
 		}
 	}
 	
+	public void setAllInitialDistances() {
+		if (debug) System.out.println(" Setting all DijkstraNode distances to initial values...");
+		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
+			if (routingCache.dijkstraNodes.get(i).id == id) {
+				routingCache.dijkstraNodes.get(i).tentative_distance = 0;
+				routingCache.dijkstraNodes.get(i).distance = 0;
+				routingCache.dijkstraNodes.get(i).visited = false;
+			}
+			else {
+				routingCache.dijkstraNodes.get(i).tentative_distance = 2147483647;
+			}
+		}
+	}
+	
+	public void setAllNeighborDistances() {
+		int working_index = 0;
+		// Find the index of the DijkstraNode which represents this node, so as to work with its neighbor node references
+		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
+			if (routingCache.dijkstraNodes.get(i).id == id) {
+				if (debug) System.out.println(" Setting DijkstraNode ID " + routingCache.dijkstraNodes.get(i).id + " as current working node." );
+				working_index = i;
+			}
+		}
+		for (int neighbor_index = 0; neighbor_index < routingCache.dijkstraNodes.get(working_index).neighbors.size(); neighbor_index++) {
+			// Find the index of each of this node's neighbor nodes
+			int neighbor_id = routingCache.dijkstraNodes.get(working_index).neighbors.get(neighbor_index);
+			if (debug) System.out.println("  Considering neighboring node with ID " + neighbor_id);
+			// Find the corresponding DijkstraNode and set its distance
+			for (int graph_index = 0; graph_index < routingCache.dijkstraNodes.size(); graph_index++) {
+				if (routingCache.dijkstraNodes.get(graph_index).id == neighbor_id) {
+					routingCache.dijkstraNodes.get(graph_index).distance = routingCache.dijkstraNodes.get(working_index).weights.get(neighbor_index);
+					routingCache.dijkstraNodes.get(graph_index).route.add(neighbor_id);
+					if (debug) System.out.println("  Found neighboring node " + neighbor_id + ". Setting its distance to: " + routingCache.dijkstraNodes.get(graph_index).distance);
+				}
+			}
+		}
+	}
+	
+	public void setThisNodeVisited() {
+		for (int dn_index = 0; dn_index < routingCache.dijkstraNodes.size(); dn_index++) {
+			if (routingCache.dijkstraNodes.get(dn_index).id == id) {
+				routingCache.dijkstraNodes.get(dn_index).visited = true;
+				if (debug) System.out.println("  Marking node " + routingCache.dijkstraNodes.get(dn_index).id + " visited.");
+			}
+		}
+	}
+	
 	/*
 	 * 	DIJKSTRA'S ALGORITHM
 	 * 	https://en.wikipedia.org/wiki/Dijkstra's_algorithm#Algorithm
@@ -58,8 +105,15 @@ public class ShortestPath {
 	public void findAllShortestPaths() {
 		findExternalPeerCount();
 		compileRoutingCache();
+		setAllInitialDistances();
+		setAllNeighborDistances();
+		setThisNodeVisited();
 		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
-			if (debug) System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size());
+			String route = "Route: ";
+			for (int r = 0; r < routingCache.dijkstraNodes.get(i).route.size(); r++) {
+				route += routingCache.dijkstraNodes.get(i).route.get(r) + " ";
+			}
+			if (debug) System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size() + "\t" + route);
 			if (routingCache.dijkstraNodes.get(i).id == id) {
 				
 			}
