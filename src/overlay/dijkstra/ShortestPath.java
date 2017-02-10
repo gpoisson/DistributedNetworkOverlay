@@ -95,11 +95,13 @@ public class ShortestPath {
 	/*
 	 * 	DIJKSTRA'S ALGORITHM
 	 * 	https://en.wikipedia.org/wiki/Dijkstra's_algorithm#Algorithm
+	 * 	http://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
 	 * 
 	 * 	1. Set the distance for all external nodes to infinity
 	 * 	2. Find distances of all immediate neighbor nodes
 	 * 	3. Mark current node as visited
-	 * 	4. Stop when target node has been reached
+	 * 	4. For each neighbor node, measure the distances of all immediate neighbor nodes, excluding any visited nodes.
+	 * 	. Stop when target node has been reached
 	 */
 	
 	public void findAllShortestPaths() {
