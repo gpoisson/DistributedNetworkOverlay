@@ -31,7 +31,7 @@ public class ShortestPath {
 		if (debug) System.out.println("  Compiling node " + id + "'s routing cache...");
 		for (int wordIndex = 0; wordIndex < msgFields.length; wordIndex++) {
 			if (msgFields[wordIndex].contains("Messaging")) {
-				int dnId = Integer.parseInt(msgFields[wordIndex + 1].charAt(4) + "");
+				int dnId = Integer.parseInt(msgFields[wordIndex + 9].split("\n")[0]);
 				if (debug) System.out.println("   Making a DijkstraNode for node " + dnId + " to put in the routing cache of node " + id);
 				DijkstraNode dn = new DijkstraNode(dnId);
 				routingCache.dijkstraNodes.add(dn);
@@ -49,7 +49,7 @@ public class ShortestPath {
 		findExternalPeerCount();
 		compileRoutingCache();
 		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
-			//System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size());
+			System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size());
 			if (routingCache.dijkstraNodes.get(i).id == id) {
 				
 			}
