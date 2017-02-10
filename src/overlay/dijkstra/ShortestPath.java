@@ -45,11 +45,21 @@ public class ShortestPath {
 		}
 	}
 	
+	/*
+	 * 	DIJKSTRA'S ALGORITHM
+	 * 	https://en.wikipedia.org/wiki/Dijkstra's_algorithm#Algorithm
+	 * 
+	 * 	1. Set the distance for all external nodes to infinity
+	 * 	2. Find distances of all immediate neighbor nodes
+	 * 	3. Mark current node as visited
+	 * 	4. Stop when target node has been reached
+	 */
+	
 	public void findAllShortestPaths() {
 		findExternalPeerCount();
 		compileRoutingCache();
 		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
-			System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size());
+			if (debug) System.out.println(" ID: " + routingCache.dijkstraNodes.get(i).id + "\tDistance: " + routingCache.dijkstraNodes.get(i).distance + "\tNeighbor Count: " + routingCache.dijkstraNodes.get(i).neighbors.size());
 			if (routingCache.dijkstraNodes.get(i).id == id) {
 				
 			}
