@@ -1,11 +1,13 @@
 package overlay.dijkstra;
 
+import java.util.ArrayList;
+
 public class RoutingCache {
 	
-	public DijkstraNode[] dijkstraNodes;
+	public ArrayList<DijkstraNode> dijkstraNodes;
 	
 	public RoutingCache() {
-		
+		dijkstraNodes = new ArrayList<DijkstraNode>();
 	}
 
 }

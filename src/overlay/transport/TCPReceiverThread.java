@@ -118,8 +118,8 @@ public class TCPReceiverThread implements Runnable {
 			if (debug) System.out.println("  TCPReceiver received LINK_WEIGHTS message...");
 			determineNodeId(msgFields);
 			parent.routingCache = new RoutingCache();
-			ShortestPath pathCalculator = new ShortestPath(msgFields, parent.routingCache, parent.id);
-			parent.routingCache.dijkstraNodes = pathCalculator.findAllShortestPaths();
+			ShortestPath pathCalculator = new ShortestPath(msgFields, parent.routingCache, parent.id, parent.debug);
+			pathCalculator.findAllShortestPaths();
 		}
 		else if (msgType == TASK_INITIATE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_INITIATE message...");
