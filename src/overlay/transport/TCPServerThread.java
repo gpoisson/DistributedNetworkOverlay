@@ -14,13 +14,14 @@ public class TCPServerThread implements Runnable {
 	private int portnumber;
 	private Node parent;
 	private boolean debug = false;
-	public boolean shutDown = false;
+	public boolean shutDown;
 	
 	public TCPServerThread(Node parent, ArrayList<Socket> messagingNodes, int portnumber, boolean debug) {
 		this.parent = parent;
 		this.messagingNodes = messagingNodes;
 		this.portnumber = portnumber;
 		this.debug = debug;
+		this.shutDown = false;
 	}
 
 	//@Override
@@ -30,6 +31,7 @@ public class TCPServerThread implements Runnable {
 			while (!shutDown) {
 				serverSocket = new ServerSocket(portnumber);
 				if (debug) System.out.println(" TCPServerThread awaiting new connection on port number " + serverSocket.getLocalPort());
+				parent.serverPortNumber = serverSocket.getLocalPort();
 				Socket newSocket = serverSocket.accept();
 				messagingNodes.add(newSocket);
 				if (debug) System.out.println(" TCPServerThread connected to new client.");

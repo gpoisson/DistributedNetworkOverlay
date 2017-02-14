@@ -55,7 +55,7 @@ public class Registry extends Node {
 		newNode.setId(uniqueNodeId);
 		newNode.setIP(msgFields[2]);
 		newNode.setLocalPort(Integer.parseInt(msgFields[3]));
-		newNode.setPublicPort(this.portNumber);
+		newNode.setPublicPort(Integer.parseInt(msgFields[4]));
 		uniqueNodeId++;
 		if (debug) System.out.println("   Incoming node IP: " + newNode.getIP());
 		if (debug) System.out.println("   Incoming node local port: " + newNode.getLocalPort());

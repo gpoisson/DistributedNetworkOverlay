@@ -20,6 +20,7 @@ public class MessagingNode extends Node {
 	public Thread receiver;			// Receiver thread listens for incoming connections 
 	public ArrayList<NodeReference> neighbors;
 	public TCPServerThread serverThread;
+	public Thread server;
 	public ArrayList<Socket> mNodes;
 	
 	public MessagingNode() {
@@ -35,9 +36,13 @@ public class MessagingNode extends Node {
 		
 		try {
 			MessagingNode mn = new MessagingNode();
-			mn.serverThread = new TCPServerThread(mn, mn.mNodes, mn.portNumber, mn.debug);
 			mn.hostname = args[0];
 			mn.portNumber = Integer.parseInt(args[1]);
+			
+			mn.serverThread = new TCPServerThread(mn, mn.mNodes, 0, mn.debug);
+			mn.server = new Thread(mn.serverThread);
+			mn.server.start();
+			
 			if (mn.debug) System.out.println(" Attempting to connect to registry via port number " + mn.portNumber);
 			mn.socket = new Socket(mn.hostname, mn.portNumber);
 			if (mn.debug) System.out.println(" Connection successfully established. Preparing to send registration request...");
@@ -79,7 +84,7 @@ public class MessagingNode extends Node {
 	
 	// Register with the Registry Node
 	private void register() {
-		Register registerMessage = new Register(this.socket.getInetAddress().toString(), this.socket.getPort());
+		Register registerMessage = new Register(this.socket.getInetAddress().toString(), this.socket.getPort(), this.serverPortNumber);
 		try {
 			if (debug) System.out.println(" Transmitting registration request...");
 			sender.sendData(registerMessage.getByteArray());
