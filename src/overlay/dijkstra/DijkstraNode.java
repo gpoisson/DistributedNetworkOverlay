@@ -11,12 +11,13 @@ public class DijkstraNode {
 	public ArrayList<Integer> neighbors;	// List of the immediate neighbors of a node
 	public ArrayList<Integer> weights;		// List of the distances from each node to its immediate neighbors
 	public int previous;
+	public String path;
 	
 	public DijkstraNode(int id) {
 		this.id = id;
 		distance = 2147483647;
 		tentative_distance = 2147483647;				// Initial distance assumed to be infinity (used max value allowable by type int)
-		route = new ArrayList<Integer>();
+		//route = new ArrayList<Integer>();
 		neighbors = new ArrayList<Integer>();
 		weights = new ArrayList<Integer>();
 		previous = 0;
@@ -31,10 +32,14 @@ public class DijkstraNode {
 		for (int w = 0; w < weights.size(); w++) {
 			txt += weights.get(w) + "\t";
 		}
+		txt += "\n  Path:      " + path;
+		/*
+		txt += "\n  Route length: " + route.size() + " steps";
 		txt += "\n  Route:     ";
 		for (int r = 0; r < route.size(); r++) {
-			txt += route.get(r) + "\t";
+			txt += this.route.get(r) + "\t";
 		}
+		*/
 		return txt;
 	}
 }
