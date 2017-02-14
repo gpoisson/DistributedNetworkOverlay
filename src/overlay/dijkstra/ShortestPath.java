@@ -139,13 +139,11 @@ public class ShortestPath {
 		int goal_id = u.id;
 		String route = "" + u.id;
 		while (u.id != this.id) {
-			if (u.previous != this.id) {
-				route = u.previous + " " + route;
-				//if (debug) System.out.println("  Current route: " + route);
-				for (int p = 0; p < routingCache.dijkstraNodes.size(); p++) {
-					if (routingCache.dijkstraNodes.get(p).id == u.previous)
-						u = routingCache.dijkstraNodes.get(p);
-				}
+			route = u.previous + " " + route;
+			//if (debug) System.out.println("  Current route: " + route);
+			for (int p = 0; p < routingCache.dijkstraNodes.size(); p++) {
+				if (routingCache.dijkstraNodes.get(p).id == u.previous)
+					u = routingCache.dijkstraNodes.get(p);
 			}
 		}
 		if (debug) System.out.println("Route compiled: " + route);
