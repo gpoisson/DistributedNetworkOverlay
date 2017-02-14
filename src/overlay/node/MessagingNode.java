@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
+import overlay.transport.TCPServerThread;
 import overlay.wireformats.Deregister;
 import overlay.wireformats.PayloadMessage;
 import overlay.wireformats.Register;
@@ -18,6 +19,8 @@ public class MessagingNode extends Node {
 	public TCPSender sender;		// Marshalling of messages into byte[] prior to transmission
 	public Thread receiver;			// Receiver thread listens for incoming connections 
 	public ArrayList<NodeReference> neighbors;
+	public TCPServerThread serverThread;
+	public ArrayList<Socket> mNodes;
 	
 	public MessagingNode() {
 		if (debug) System.out.println("Building messaging node...");
@@ -32,6 +35,7 @@ public class MessagingNode extends Node {
 		
 		try {
 			MessagingNode mn = new MessagingNode();
+			mn.serverThread = new TCPServerThread(mn, mn.mNodes, mn.portNumber, mn.debug);
 			mn.hostname = args[0];
 			mn.portNumber = Integer.parseInt(args[1]);
 			if (mn.debug) System.out.println(" Attempting to connect to registry via port number " + mn.portNumber);
@@ -55,6 +59,8 @@ public class MessagingNode extends Node {
 					// Print shortest path to all other messaging nodes
 					if (mn.debug) System.out.println("Shortest path to all other nodes:");
 					for (int neighborNode = 0; neighborNode < mn.routingCache.dijkstraNodes.size(); neighborNode++){
+						if (mn.routingCache.dijkstraNodes.get(neighborNode).id == mn.id)
+							System.out.println("--THIS NODE--");
 						System.out.println(mn.routingCache.dijkstraNodes.get(neighborNode).toString());
 					}
 				}
@@ -94,31 +100,30 @@ public class MessagingNode extends Node {
 			System.out.println(ioe);
 		}
 	}
-	
-	private String chooseDestination(){
-		Random rand = new Random();
-		int randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
-		int randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;
-		// Don't send messages to self
-		while (randomNodeID == this.id){
-			randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
-			randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;			
-		}
-		String randomNodePath = routingCache.dijkstraNodes.get(randomIndex).path;
-		if (debug) System.out.println(" Randomly picked node " + randomNodeID + " to transmit messages...");
-		return randomNodePath;
-	}
-	
+		
 	public void transmitMessages(int numRounds) {
 		// For each round, choose a random external node
 		// Find routing plan in routing cache, encode into message
 		// Generate random payload and transmit
 		int messagesPerRound = 5;
+		Random rand = new Random();
+		
 		for (int round = 0; round < numRounds; round++){
+			// Randomly choose a node to send to
+			int randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
+			int randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;
+			// Don't send messages to self
+			while (randomNodeID == this.id){
+				randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
+				randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;			
+			}
+			String randomNodePath = routingCache.dijkstraNodes.get(randomIndex).path;
+			
+			if (debug) System.out.println(" Randomly picked node " + randomNodeID + " to transmit messages...");
 			for (int msg = 0; msg < messagesPerRound; msg++){
 				PayloadMessage pMsg = new PayloadMessage();
 				pMsg.generatePayload();
-				pMsg.encodeTransmissionPath(chooseDestination());
+				pMsg.encodeTransmissionPath(randomNodePath);
 			}
 		}
 		

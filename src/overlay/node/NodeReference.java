@@ -2,6 +2,8 @@ package overlay.node;
 
 import java.util.ArrayList;
 
+import overlay.transport.TCPSender;
+
 public class NodeReference {
 	
 	private String ipAddress;
@@ -9,9 +11,13 @@ public class NodeReference {
 	private int publicPort;
 	private int id;
 	public ArrayList<LinkWeight> neighbors;
+	public ArrayList<TCPSender> senders;
+	public ArrayList<Thread> receivers;
 	
 	public NodeReference() {
 		neighbors = new ArrayList<LinkWeight>();
+		senders = new ArrayList<TCPSender>();
+		receivers = new ArrayList<Thread>();
 	}
 
 	public void setIP(String ipAddress) {
