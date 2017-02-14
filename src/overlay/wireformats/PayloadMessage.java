@@ -14,4 +14,8 @@ public class PayloadMessage extends Message {
 		int r = random.nextInt();
 		return r + "";
 	}
+	
+	public void encodeTransmissionPath(String path){
+		identifier = " -- " + path + " -- " + identifier;
+	}
 }

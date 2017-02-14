@@ -75,14 +75,6 @@ public class ShortestPath {
 			// Find the index of each of this node's neighbor nodes
 			int neighbor_id = routingCache.dijkstraNodes.get(working_index).neighbors.get(neighbor_index);
 			if (debug) System.out.println("  Considering neighboring node with ID " + neighbor_id);
-			// Find the corresponding DijkstraNode and set its distance
-			/*for (int graph_index = 0; graph_index < routingCache.dijkstraNodes.size(); graph_index++) {
-				if (routingCache.dijkstraNodes.get(graph_index).id == neighbor_id) {
-					routingCache.dijkstraNodes.get(graph_index).distance = routingCache.dijkstraNodes.get(working_index).weights.get(neighbor_index);
-					routingCache.dijkstraNodes.get(graph_index).route.add(neighbor_id);
-					if (debug) System.out.println("  Found neighboring node " + neighbor_id + ". Setting its distance to: " + routingCache.dijkstraNodes.get(graph_index).distance);
-				}
-			}*/
 		}
 	}
 	
@@ -94,19 +86,7 @@ public class ShortestPath {
 	
 	private DijkstraNode removeMinDist() {
 		DijkstraNode min = routingCache.dijkstraNodes.get(0);
-		/*int min_id = 0;
-		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++) {
-			if (routingCache.dijkstraNodes.get(i).distance < min.distance){
-				min = routingCache.dijkstraNodes.get(i);
-				min_id = routingCache.dijkstraNodes.get(i).id;
-			}
-		}
-		for (int p = 0; p < priorityQueue.size(); p++) {
-			if (priorityQueue.get(p).id == min_id) {
-				priorityQueue.remove(p);
-				break;
-			}
-		}*/
+
 		int min_dist = 2147483647;
 		int min_index = 0;
 		for (int i = 0; i < priorityQueue.size(); i++) {
@@ -140,7 +120,6 @@ public class ShortestPath {
 		String route = "" + u.id;
 		while (u.id != this.id) {
 			route = u.previous + " " + route;
-			//if (debug) System.out.println("  Current route: " + route);
 			for (int p = 0; p < routingCache.dijkstraNodes.size(); p++) {
 				if (routingCache.dijkstraNodes.get(p).id == u.previous)
 					u = routingCache.dijkstraNodes.get(p);
@@ -149,16 +128,17 @@ public class ShortestPath {
 		if (debug) System.out.println("Route compiled: " + route);
 		for (int i = 0; i < routingCache.dijkstraNodes.size(); i++){
 			if (routingCache.dijkstraNodes.get(i).id == goal_id){
+				// Delete any reference to the source node
+				String routeList[] = route.split(" ");
+				if (Integer.parseInt(routeList[0]) == this.id){
+					route = "";
+					for (int j = 1; j < routeList.length; j++){
+						route += routeList[j] + " ";
+					}
+				}
 				routingCache.dijkstraNodes.get(i).path = route;
 			}
 		}
-		/*String[] routeList = route.split(" ");
-		u.route = new ArrayList<Integer>();
-		for (int step = 0; step < routeList.length; step++) {
-			int nodeStep = Integer.parseInt(routeList[step]);
-			if (nodeStep != this.id)
-				u.route.add(nodeStep);
-		}*/
 	}
 	
 	public void findAllShortestPaths() {

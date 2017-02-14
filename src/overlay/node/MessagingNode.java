@@ -3,6 +3,7 @@ package overlay.node;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 import overlay.transport.TCPReceiverThread;
@@ -53,6 +54,9 @@ public class MessagingNode extends Node {
 				else if (input[0].equals("print-shortest-path")) {
 					// Print shortest path to all other messaging nodes
 					if (mn.debug) System.out.println("Shortest path to all other nodes:");
+					for (int neighborNode = 0; neighborNode < mn.routingCache.dijkstraNodes.size(); neighborNode++){
+						System.out.println(mn.routingCache.dijkstraNodes.get(neighborNode).toString());
+					}
 				}
 				else if (input[0].equals("exit-overlay")) {
 					// Deregister and shut down
@@ -91,11 +95,34 @@ public class MessagingNode extends Node {
 		}
 	}
 	
+	private String chooseDestination(){
+		Random rand = new Random();
+		int randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
+		int randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;
+		// Don't send messages to self
+		while (randomNodeID == this.id){
+			randomIndex = rand.nextInt(routingCache.dijkstraNodes.size());
+			randomNodeID = routingCache.dijkstraNodes.get(randomIndex).id;			
+		}
+		String randomNodePath = routingCache.dijkstraNodes.get(randomIndex).path;
+		if (debug) System.out.println(" Randomly picked node " + randomNodeID + " to transmit messages...");
+		return randomNodePath;
+	}
+	
 	public void transmitMessages(int numRounds) {
-		PayloadMessage pMsg = new PayloadMessage();
 		// For each round, choose a random external node
 		// Find routing plan in routing cache, encode into message
 		// Generate random payload and transmit
+		int messagesPerRound = 5;
+		for (int round = 0; round < numRounds; round++){
+			for (int msg = 0; msg < messagesPerRound; msg++){
+				PayloadMessage pMsg = new PayloadMessage();
+				pMsg.generatePayload();
+				pMsg.encodeTransmissionPath(chooseDestination());
+			}
+		}
+		
+		// Send TASK_COMPLETE to registry
 	}
 
 	public static void usage() {
