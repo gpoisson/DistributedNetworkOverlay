@@ -19,13 +19,13 @@ public class MessagingNode extends Node {
 	public TCPSender sender;		// Marshalling of messages into byte[] prior to transmission
 	public Thread receiver;			// Receiver thread listens for incoming connections 
 	public ArrayList<NodeReference> neighbors;
-	public TCPServerThread serverThread;
 	public Thread server;
 	public ArrayList<Socket> mNodes;
 	
 	public MessagingNode() {
 		if (debug) System.out.println("Building messaging node...");
 		neighbors = new ArrayList<NodeReference>();
+		mNodes = new ArrayList<Socket>();
 	}
 
 	public static void main(String[] args) {
@@ -105,8 +105,24 @@ public class MessagingNode extends Node {
 			System.out.println(ioe);
 		}
 	}
+	
+	public void makeSockets(){
+		if (debug) System.out.println("Making sockets to connect to other messaging nodes...");
+		for (int neighbor = 0; neighbor < neighbors.size(); neighbor++){
+			try {
+				if (debug) System.out.println(" Establishing a socket to node " + neighbors.get(neighbor).getId() + ": " + neighbors.get(neighbor).getIP() + "  " + neighbors.get(neighbor).getPublicPort());
+				Socket s = new Socket(neighbors.get(neighbor).getIP(), neighbors.get(neighbor).getPublicPort());
+				mNodes.add(s);
+			} catch (IOException ioe) {
+				System.out.println(ioe);
+			}
+		}
+		if (debug) System.out.println("Made " + mNodes.size() + " sockets.");
+	}
 		
+	@Override
 	public void transmitMessages(int numRounds) {
+		makeSockets();
 		// For each round, choose a random external node
 		// Find routing plan in routing cache, encode into message
 		// Generate random payload and transmit

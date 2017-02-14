@@ -17,7 +17,6 @@ import overlay.wireformats.TaskInitiate;
 public class Registry extends Node {
 
 	public Thread server;
-	public TCPServerThread serverThread;
 	public TCPSender sender;
 	public Thread receiver;
 	public ArrayList<Socket> messagingNodes;

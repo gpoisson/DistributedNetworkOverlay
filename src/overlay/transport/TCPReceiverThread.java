@@ -108,6 +108,8 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == DEREGISTER_RESPONSE) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER_RESPONSE message...");
+			if (parent.serverThread.shutDown == false)
+				parent.serverThread.shutDown();
 			if (debug) System.out.println("Node shutting down...");
 			System.exit(0);
 		}
@@ -123,12 +125,16 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == TASK_INITIATE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_INITIATE message...");
+			parent.transmitMessages(Integer.parseInt(msgFields[2]));
 		}
 		else if (msgType == TASK_COMPLETE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_COMPLETE message...");
 		}
 		else if (msgType == PULL_TRAFFIC_SUMMARY) {
 			if (debug) System.out.println("  TCPReceiver received PULL_TRAFFIC_SUMMARY message...");
+		}
+		else if (msgType == PAYLOAD_MESSAGE) {
+			
 		}
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");
