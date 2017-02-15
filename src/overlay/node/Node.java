@@ -21,6 +21,8 @@ public abstract class Node {
 	public int sendTracker = 0;
 	public int relayTracker = 0;
 	public RoutingCache routingCache;
+	public int totalNodes;
+	public int tasksCompleted;
 	
 	public String toString() {
 		return "Host: " + hostname + "\tPort: " + portNumber;

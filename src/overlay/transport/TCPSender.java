@@ -17,7 +17,7 @@ public class TCPSender {
 		dout = new DataOutputStream(this.socket.getOutputStream());
 	}
 	
-	public void sendData(byte[] dataToSend) throws IOException {
+	public synchronized void sendData(byte[] dataToSend) throws IOException {
 		if (debug) System.out.println("  TCPSender preparing to send data...");
 		int dataLength = dataToSend.length;
 		if (debug) System.out.println("  TCPSender message length: " + dataLength);

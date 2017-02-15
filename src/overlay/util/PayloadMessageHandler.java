@@ -29,7 +29,7 @@ public class PayloadMessageHandler {
 		}
 	}
 	
-	private Socket obtainSocket(int next){
+	public Socket obtainSocket(int next){
 		for (int i = 0; i < messagingNode.mNodeIDs.size(); i++){
 			if (messagingNode.mNodeIDs.get(i) == next) {
 				if (debug) System.out.println("  Socket for node " + next + " obtained.");
@@ -39,42 +39,79 @@ public class PayloadMessageHandler {
 		return null;
 	}
 	
-	private int determineNextID(PayloadMessage pMsg) {
+	public int determineNextID(PayloadMessage pMsg) {
 		if (debug) System.out.println(" Determining ID of next node in message's path...");
 		int next = 0;
 		String[] msgFields = pMsg.toString().split(" ");
-		int startPath = 3;															// Index of first element of the path
-		int endPath = 0;															// Need to find last element of path
-		for (int word_index = 2; word_index < msgFields.length; word_index++){
-			if (msgFields[word_index].contains("<path")){
-				endPath = word_index;
+		
+		// First determine where in the message the path is specified
+		int pathStart = 0;
+		int pathEnd = 0;
+		for (int word_index = 0; word_index < msgFields.length; word_index++) {
+			if (msgFields[word_index].contains("path>")) {
+				pathStart = word_index + 1;
+			}
+			else if (msgFields[word_index].contains("<path")) {
+				pathEnd = word_index;
 			}
 		}
-		int pathLength = endPath - startPath;
-		assert (pathLength > 0);													// Path length must be positive or there has been some error
-		int[] path = new int[pathLength];
-		for (int step = startPath; step < endPath; step++){
-			path[step - startPath] = Integer.parseInt(msgFields[step]);
-		}
-		if (debug) {
-			String p = "";
-			for (int i = 0; i < path.length; i++){
-				p += path[i] + " ";
+		
+		// Path must have positive length
+		assert pathEnd > pathStart;
+		
+		// Determine where in the message's path it currently is
+		for (int word_index = pathStart; word_index < pathEnd; word_index++){
+			if (Integer.parseInt(msgFields[word_index]) == messagingNode.id) {
+				if (debug) System.out.println("  PayloadMessage has " + (pathEnd - word_index - 1) + " further transmissions remaining.");
+				if ((pathEnd - word_index - 1) > 0) {
+					next = Integer.parseInt(msgFields[word_index + 1]);
+				}
 			}
-			System.out.println(" Full path: " + p);
 		}
-		for (int n = 0; n < path.length; n++){
-			if (path[n] == messagingNode.id){
-				if (n < path.length - 1){
-					next = path[n+1];
-					if (debug) System.out.println("  Determined next node in path to be: " + next);
+		if (next == 0) { 		// This node's ID was not found in path --> this node must be the source.
+			next = Integer.parseInt(msgFields[pathStart]);
+		}
+		if (debug) System.out.println("  PayloadMessage's next destination: " + next);
+		return next;
+	}
+	
+	public int determineNextID(String pMsg) {
+		if (debug) System.out.println(" Determining ID of next node in message's path...");
+		int next = 0;
+		String[] msgFields = pMsg.split(" ");
+		
+		// First determine where in the message the path is specified
+		int pathStart = 0;
+		int pathEnd = 0;
+		for (int word_index = 0; word_index < msgFields.length; word_index++) {
+			if (msgFields[word_index].contains("path>")) {
+				pathStart = word_index + 1;
+			}
+			else if (msgFields[word_index].contains("<path")) {
+				pathEnd = word_index;
+			}
+		}
+		
+		// Path must have positive length
+		assert pathEnd > pathStart;
+		
+		// Determine where in the message's path it currently is
+		for (int word_index = pathStart; word_index < pathEnd; word_index++){
+			if (Integer.parseInt(msgFields[word_index]) == messagingNode.id) {
+				if (debug) System.out.println("  PayloadMessage has " + (pathEnd - word_index - 1) + " further transmissions remaining.");
+				if ((pathEnd - word_index - 1) > 0) {
+					next = Integer.parseInt(msgFields[word_index + 1]);
 				}
 				else {
+					if (debug) System.out.println("  PayloadMessage has reached destination.");
 					next = -1;
-					if (debug) System.out.println("  No further nodes in path.");
 				}
 			}
 		}
+		if (next == 0) { 		// This node's ID was not found in path --> this node must be the source.
+			next = Integer.parseInt(msgFields[pathStart]);
+		}
+		if (debug) System.out.println("  PayloadMessage's next destination: " + next);
 		return next;
 	}
 	

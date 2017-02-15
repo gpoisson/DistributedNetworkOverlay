@@ -5,12 +5,16 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import overlay.dijkstra.RoutingCache;
 import overlay.dijkstra.ShortestPath;
+import overlay.node.MessagingNode;
 import overlay.node.Node;
 import overlay.node.NodeReference;
+import overlay.util.PayloadMessageHandler;
 import overlay.wireformats.DeregisterResponse;
+import overlay.wireformats.PullTrafficSummary;
 import overlay.wireformats.RegisterResponse;
 
 public class TCPReceiverThread implements Runnable {
@@ -19,6 +23,7 @@ public class TCPReceiverThread implements Runnable {
 	private Socket socket;
 	private TCPSender sender;
 	private DataInputStream din;
+	private PayloadMessageHandler pmh;
 	private boolean debug;
 	
 	private final int REGISTER = 0;
@@ -116,6 +121,7 @@ public class TCPReceiverThread implements Runnable {
 		// Register message (Registry only)
 		if (msgType == REGISTER) {
 			if (debug) System.out.println("  TCPReceiver received REGISTER message...");
+			parent.totalNodes++;
 			RegisterResponse rrMsg = new RegisterResponse();
 			parent.register(msgFields);
 			try {
@@ -131,6 +137,7 @@ public class TCPReceiverThread implements Runnable {
 		else if (msgType == DEREGISTER) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER message...");
 			parent.deregister(msgFields);
+			parent.totalNodes--;
 		}
 		else if (msgType == DEREGISTER_RESPONSE) {
 			if (debug) System.out.println("  TCPReceiver received DEREGISTER_RESPONSE message...");
@@ -156,13 +163,39 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == TASK_COMPLETE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_COMPLETE message...");
+			parent.tasksCompleted++;
+			PullTrafficSummary ptsMsg = new PullTrafficSummary();
+			try {
+				TimeUnit.SECONDS.sleep(15);
+			} catch (InterruptedException e1) {
+				System.out.println(e1);
+			}
+			try {
+				sender.sendData(ptsMsg.getByteArray());
+			} catch (IOException e) {
+				System.out.println(e);
+			}
 		}
 		else if (msgType == PULL_TRAFFIC_SUMMARY) {
 			if (debug) System.out.println("  TCPReceiver received PULL_TRAFFIC_SUMMARY message...");
 		}
 		else if (msgType == PAYLOAD_MESSAGE) {
 			if (debug) System.out.println("  TCPReceiver received PAYLOAD_MESSAGE message...");
-			if (debug) System.out.println("    " + msgFields.toString());
+			String msg = "";
+			for (int i = 0; i < msgFields.length; i++){
+				msg += msgFields[i] + " ";
+			}
+			if (debug) System.out.println("    Received message reads: " + msg);
+			this.pmh = new PayloadMessageHandler((MessagingNode) parent, debug);
+			int next = this.pmh.determineNextID(msg);
+			if (next == -1) {
+				parent.receiveTracker++;
+				if (debug) System.out.println(" Consuming message.");
+			}
+			else {
+				parent.relayTracker++;
+				if (debug) System.out.println(" Relaying message.");
+			}
 		}
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");

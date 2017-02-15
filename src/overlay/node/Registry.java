@@ -45,6 +45,9 @@ public class Registry extends Node {
 		// Storage for senders and receivers
 		nodeSenders = new ArrayList<TCPSender>();
 		nodeReceivers = new ArrayList<Thread>();
+		
+		totalNodes = 0;
+		tasksCompleted = 0;
 	}
 	
 	@Override

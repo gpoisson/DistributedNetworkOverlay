@@ -13,6 +13,7 @@ import overlay.util.PayloadMessageHandler;
 import overlay.wireformats.Deregister;
 import overlay.wireformats.PayloadMessage;
 import overlay.wireformats.Register;
+import overlay.wireformats.TaskComplete;
 
 public class MessagingNode extends Node {
 	
@@ -114,8 +115,13 @@ public class MessagingNode extends Node {
 			try {
 				if (debug) System.out.println(" Establishing a socket to node " + neighbors.get(neighbor).getId() + ": " + neighbors.get(neighbor).getIP() + "  " + neighbors.get(neighbor).getPublicPort());
 				Socket s = new Socket(neighbors.get(neighbor).getIP(), neighbors.get(neighbor).getPublicPort());
+				TCPSender sender = new TCPSender(s, debug);
 				mNodeSockets.add(s);
 				mNodeIDs.add(neighbors.get(neighbor).getId());
+				if (debug) System.out.println(" Establishing TCPReceiver to listen for node " + neighbors.get(neighbor).getId());
+				Thread t = new Thread(new TCPReceiverThread(this, sender, s, debug));
+				t.start();
+				neighbors.get(neighbor).receivers.add(receiver);
 			} catch (IOException ioe) {
 				System.out.println(ioe);
 			}
@@ -153,10 +159,17 @@ public class MessagingNode extends Node {
 				if (debug) System.out.println("   Payload message assembled and path encoded. Preparing to transmit...");
 				if (debug) System.out.println("      Payload message contents: " + pMsg.toString());
 				handler.transmit(pMsg);
+				sendTracker++;
 			}
 		}
 		
 		// Send TASK_COMPLETE to registry
+		TaskComplete tcMsg = new TaskComplete();
+		try {
+			sender.sendData(tcMsg.getByteArray());
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 	}
 
 	public static void usage() {

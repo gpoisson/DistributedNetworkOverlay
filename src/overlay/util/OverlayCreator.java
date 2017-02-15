@@ -49,6 +49,7 @@ public class OverlayCreator {
 			int number_of_links_in_completed_overlay = numNodes * linksPerNode;
 			int current_number_of_links_in_overlay = 0;
 			
+			// Generate linear topology
 			for (int node = 0; node < nodeRefs.size(); node++){
 				if (node < nodeRefs.size()-1){
 					connectNodes(node, node + 1);
@@ -60,25 +61,29 @@ public class OverlayCreator {
 				}
 			}
 			
-			Random rand = new Random(); 
+			// Fill in remaining links
+			int fewest_links_node = 0;
+			int second_fewest_links_node = 0;
 			while (current_number_of_links_in_overlay < number_of_links_in_completed_overlay){
-				int randNode1 = rand.nextInt(nodeRefs.size());
-				int randNode2 = rand.nextInt(nodeRefs.size());
-				
-				// If this node has the max number of links, pick a different node
-				while (nodeRefs.get(randNode1).neighbors.size() >= linksPerNode){
-					randNode1 = rand.nextInt(nodeRefs.size());
+				int fewest = linksPerNode;
+				int second_fewest = linksPerNode;
+				// Find node with fewest links
+				for (int node = 0; node < nodeRefs.size(); node++){
+					if (nodeRefs.get(node).neighbors.size() < fewest) {
+						fewest = nodeRefs.get(node).neighbors.size();
+						fewest_links_node = node;
+					}
 				}
-				if (debug) System.out.println(" randNode1 = " + nodeRefs.get(randNode1).getId());
-				while ((nodeRefs.get(randNode1).getId() == nodeRefs.get(randNode2).getId()) || (nodeRefs.get(randNode2).neighbors.size() >= linksPerNode) || (nodesAreLinked(randNode1, randNode2))){
-					randNode2 = rand.nextInt(nodeRefs.size());
-					System.out.println(nodeRefs.get(randNode2).getId() + " has " + nodeRefs.get(randNode2).neighbors.size() + " links.");
+				// Find node with second fewest links
+				for (int node = 0; node < nodeRefs.size(); node++){
+					if ((node != fewest_links_node) && (nodeRefs.get(node).neighbors.size() < second_fewest) && (!nodesAreLinked(node, fewest_links_node))) {
+						second_fewest = nodeRefs.get(node).neighbors.size();
+						second_fewest_links_node = node;
+					}
 				}
-				if (debug) System.out.println(" randNode2 = " + nodeRefs.get(randNode2).getId());
-				connectNodes(randNode1, randNode2);
+				connectNodes(fewest_links_node, second_fewest_links_node);
 				current_number_of_links_in_overlay += 2;
-				if (debug) System.out.println(" Now there are " + current_number_of_links_in_overlay + "/" + number_of_links_in_completed_overlay + " links.");
-			}			
+			}
 		}
 		if (debug) System.out.println(" Registry overlay complete.");
 	}
