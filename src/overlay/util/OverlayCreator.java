@@ -2,6 +2,7 @@ package overlay.util;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 import overlay.node.LinkWeight;
 import overlay.node.NodeReference;
@@ -59,78 +60,24 @@ public class OverlayCreator {
 				}
 			}
 			
-			Random rand = new Random();
+			Random rand = new Random(); 
 			while (current_number_of_links_in_overlay < number_of_links_in_completed_overlay){
 				int randNode1 = rand.nextInt(nodeRefs.size());
 				int randNode2 = rand.nextInt(nodeRefs.size());
+				
+				// If this node has the max number of links, pick a different node
 				while (nodeRefs.get(randNode1).neighbors.size() >= linksPerNode){
 					randNode1 = rand.nextInt(nodeRefs.size());
 				}
-				while ((randNode1 == randNode2) || (nodeRefs.get(randNode2).neighbors.size() >= linksPerNode) || (nodesAreLinked(randNode1, randNode2))){
+				if (debug) System.out.println(" randNode1 = " + nodeRefs.get(randNode1).getId());
+				while ((nodeRefs.get(randNode1).getId() == nodeRefs.get(randNode2).getId()) || (nodeRefs.get(randNode2).neighbors.size() >= linksPerNode) || (nodesAreLinked(randNode1, randNode2))){
 					randNode2 = rand.nextInt(nodeRefs.size());
 				}
+				if (debug) System.out.println(" randNode2 = " + nodeRefs.get(randNode2).getId());
 				connectNodes(randNode1, randNode2);
-				current_number_of_links_in_overlay += 2;				
-			}
-			
-			/*
-			fewest_number_of_links = nodeRefs.get(index_of_node_with_fewest_links).neighbors.size();
-			second_fewest_number_of_links = current_number_of_links_in_overlay;
-			
-			// Generate linear topology
-			for (int node = 0; node < nodeRefs.size(); node++){
-				if (node < nodeRefs.size()-1){
-					connectNodes(node, node + 1);
-					current_number_of_links_in_overlay += 2;
-				}
-				else{
-					connectNodes(node, 0);
-					current_number_of_links_in_overlay += 2;
-				}
-				
-				for (int current_node_index = 0; current_node_index < numNodes; current_node_index++) {			// Iterate through nodes to find the node with the fewest links
-					if (nodeRefs.get(current_node_index).neighbors.size() < fewest_number_of_links) {
-						index_of_node_with_fewest_links = current_node_index;
-						fewest_number_of_links = nodeRefs.get(current_node_index).neighbors.size();
-						if (debug) System.out.println(" New value for fewest no. of links:  Node " + nodeRefs.get(index_of_node_with_fewest_links).getId() + " - " + fewest_number_of_links + " links");
-					}
-				}
-				for (int current_node_index = 0; current_node_index < numNodes; current_node_index++) {			// Iterate through nodes to find the node with the second fewest links
-					if ((current_node_index != index_of_node_with_fewest_links) && (!nodesAreLinked(index_of_node_with_fewest_links, current_node_index)) && (nodeRefs.get(current_node_index).neighbors.size() < second_fewest_number_of_links)) {
-						index_of_node_with_second_fewest_links = current_node_index;
-						second_fewest_number_of_links = nodeRefs.get(current_node_index).neighbors.size();
-						if (debug) System.out.println(" New value for second fewest no. of links:  Node " + nodeRefs.get(index_of_node_with_second_fewest_links).getId() + " - " + second_fewest_number_of_links + " links");
-					}
-				}
-			}
-			
-			// Evenly distribute the rest of the links
-			while (current_number_of_links_in_overlay < number_of_links_in_completed_overlay) {					// Repeat the search for incomplete nodes until all nodes are complete
-				if (debug) System.out.println(" Overlay contains " + current_number_of_links_in_overlay + "/" + number_of_links_in_completed_overlay + " links.");
-				index_of_node_with_fewest_links = 0;
-				index_of_node_with_second_fewest_links = 1;
-				fewest_number_of_links = nodeRefs.get(index_of_node_with_fewest_links).neighbors.size();		// At each iteration, assume the first node has the fewest links
-				second_fewest_number_of_links = current_number_of_links_in_overlay;								// At each iteration, assume the second fewest links is a large number
-				if (debug) System.out.println(" Assuming the node with the fewest links is node " + nodeRefs.get(index_of_node_with_fewest_links).getId() + " with " + second_fewest_number_of_links + " links.");
-				if (debug) System.out.println(" Assuming the node with the second fewest links is node " + nodeRefs.get(index_of_node_with_second_fewest_links).getId() + " with " + fewest_number_of_links + " links.");
-				for (int current_node_index = 0; current_node_index < numNodes; current_node_index++) {			// Iterate through nodes to find the node with the fewest links
-					if (nodeRefs.get(current_node_index).neighbors.size() < fewest_number_of_links) {
-						index_of_node_with_fewest_links = current_node_index;
-						fewest_number_of_links = nodeRefs.get(current_node_index).neighbors.size();
-						if (debug) System.out.println(" New value for fewest no. of links:  Node " + nodeRefs.get(index_of_node_with_fewest_links).getId() + " - " + fewest_number_of_links + " links");
-					}
-				}
-				for (int current_node_index = 0; current_node_index < numNodes; current_node_index++) {			// Iterate through nodes to find the node with the second fewest links
-					if ((current_node_index != index_of_node_with_fewest_links) && (!nodesAreLinked(index_of_node_with_fewest_links, current_node_index)) && (nodeRefs.get(current_node_index).neighbors.size() < second_fewest_number_of_links)) {
-						index_of_node_with_second_fewest_links = current_node_index;
-						second_fewest_number_of_links = nodeRefs.get(current_node_index).neighbors.size();
-						if (debug) System.out.println(" New value for second fewest no. of links:  Node " + nodeRefs.get(index_of_node_with_second_fewest_links).getId() + " - " + second_fewest_number_of_links + " links");
-					}
-				}
-				connectNodes(index_of_node_with_fewest_links, index_of_node_with_second_fewest_links);
 				current_number_of_links_in_overlay += 2;
-			}*/
-			
+				if (debug) System.out.println(" Now there are " + current_number_of_links_in_overlay + "/" + number_of_links_in_completed_overlay + " links.");
+			}			
 		}
 		if (debug) System.out.println(" Registry overlay complete.");
 	}

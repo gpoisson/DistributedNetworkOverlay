@@ -17,9 +17,9 @@ public abstract class Node {
 	public int id = -1;
 	public boolean debug = true;
 	public int currentNeighborCount = 0;
-	protected int receiveTracker = 0;
-	protected int sendTracker = 0;
-	protected int relayTracker = 0;
+	public int receiveTracker = 0;
+	public int sendTracker = 0;
+	public int relayTracker = 0;
 	public RoutingCache routingCache;
 	
 	public String toString() {

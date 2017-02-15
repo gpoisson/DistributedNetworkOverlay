@@ -9,6 +9,7 @@ import java.util.Scanner;
 import overlay.transport.TCPReceiverThread;
 import overlay.transport.TCPSender;
 import overlay.transport.TCPServerThread;
+import overlay.util.PayloadMessageHandler;
 import overlay.wireformats.Deregister;
 import overlay.wireformats.PayloadMessage;
 import overlay.wireformats.Register;
@@ -131,6 +132,7 @@ public class MessagingNode extends Node {
 		// Generate random payload and transmit
 		int messagesPerRound = 5;
 		Random rand = new Random();
+		PayloadMessageHandler handler = new PayloadMessageHandler(this, debug);
 		
 		for (int round = 0; round < numRounds; round++){
 			// Randomly choose a node to send to
@@ -150,64 +152,11 @@ public class MessagingNode extends Node {
 				pMsg.getByteArray();
 				if (debug) System.out.println("   Payload message assembled and path encoded. Preparing to transmit...");
 				if (debug) System.out.println("      Payload message contents: " + pMsg.toString());
-				handlePayloadMessage(pMsg);
+				handler.transmit(pMsg);
 			}
 		}
 		
 		// Send TASK_COMPLETE to registry
-	}
-
-	private void handlePayloadMessage(PayloadMessage pMsg) {
-		if (debug) System.out.println(" Handling payload message...");
-		Socket relay;																// Reference to the socket to the next node in the path
-		String[] msgFields = pMsg.toString().split(" ");
-		int startPath = 3;															// Index of first element of the path
-		int endPath = 0;															// Need to find last element of path
-		for (int word_index = 2; word_index < msgFields.length; word_index++){
-			if (msgFields[word_index].contains("<path")){
-				endPath = word_index;
-			}
-		}
-		int pathLength = endPath - startPath;
-		assert (pathLength > 0);													// Path length must be positive or there has been some error
-		int[] path = new int[pathLength];
-		for (int step = startPath; step < endPath; step++){
-			path[step - startPath] = Integer.parseInt(msgFields[step]);
-		}
-		boolean isDestination = false;
-		if (path[path.length-1] == this.id) { isDestination = true; }				// Determine if this is the message's final stop
-		if (!isDestination){
-			if (debug) System.out.println("  Not destination for this message, passing it on...");
-			int next = 0;
-			for (int step = 0; step < path.length; step++){							// Determine where to relay the message to
-				if (path[step] == this.id) { next = path[step + 1]; }
-				if (debug) {
-					System.out.println("  Next step in message path: " + next);
-					String p = "";
-					for (int s = 0; s < path.length; s++){
-						p += path[s] + " ";
-					}
-					System.out.println("  Full path: " + p);
-				}
-				for (int node = 0; node < mNodeIDs.size(); node++){
-					if (mNodeIDs.get(node) == next){
-						relay = mNodeSockets.get(node + 1);
-						try {
-							if (debug) System.out.println("\t  Sending <" + pMsg.toString() + "> to node " + path[step]);
-							TCPSender sender = new TCPSender(relay, this.debug);
-							sender.sendData(pMsg.getByteArray());
-							relayTracker++;
-						} catch (IOException ioe) {
-							System.out.println(ioe);
-						}
-						break;
-					}
-				}
-			}
-		}
-		else if (isDestination){
-			if (debug) System.out.println("  Received payload message at the end of its path. Preparing to process.");
-		}
 	}
 
 	public static void usage() {
