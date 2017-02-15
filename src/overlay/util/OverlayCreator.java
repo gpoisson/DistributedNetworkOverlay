@@ -72,6 +72,7 @@ public class OverlayCreator {
 				if (debug) System.out.println(" randNode1 = " + nodeRefs.get(randNode1).getId());
 				while ((nodeRefs.get(randNode1).getId() == nodeRefs.get(randNode2).getId()) || (nodeRefs.get(randNode2).neighbors.size() >= linksPerNode) || (nodesAreLinked(randNode1, randNode2))){
 					randNode2 = rand.nextInt(nodeRefs.size());
+					System.out.println(nodeRefs.get(randNode2).getId() + " has " + nodeRefs.get(randNode2).neighbors.size() + " links.");
 				}
 				if (debug) System.out.println(" randNode2 = " + nodeRefs.get(randNode2).getId());
 				connectNodes(randNode1, randNode2);
