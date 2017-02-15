@@ -16,6 +16,7 @@ import overlay.util.PayloadMessageHandler;
 import overlay.wireformats.DeregisterResponse;
 import overlay.wireformats.PullTrafficSummary;
 import overlay.wireformats.RegisterResponse;
+import overlay.wireformats.TrafficSummary;
 
 public class TCPReceiverThread implements Runnable {
 
@@ -36,6 +37,7 @@ public class TCPReceiverThread implements Runnable {
 	private final int TASK_COMPLETE = 7;
 	private final int PULL_TRAFFIC_SUMMARY = 8;
 	private final int PAYLOAD_MESSAGE = 9;
+	private final int TRAFFIC_SUMMARY = 10;
 	
 	// TCPReceiverThread maintains a reference to the node's TCPSender thread,
 	//    in order to send response messages when appropriate.
@@ -165,6 +167,7 @@ public class TCPReceiverThread implements Runnable {
 			if (debug) System.out.println("  TCPReceiver received TASK_COMPLETE message...");
 			parent.tasksCompleted++;
 			PullTrafficSummary ptsMsg = new PullTrafficSummary();
+			if (debug) System.out.println("  Waiting 15 seconds before issuing Pull Traffic Summary message...");
 			try {
 				TimeUnit.SECONDS.sleep(15);
 			} catch (InterruptedException e1) {
@@ -178,24 +181,29 @@ public class TCPReceiverThread implements Runnable {
 		}
 		else if (msgType == PULL_TRAFFIC_SUMMARY) {
 			if (debug) System.out.println("  TCPReceiver received PULL_TRAFFIC_SUMMARY message...");
+			TrafficSummary tsMsg = new TrafficSummary(parent.sendTracker, parent.receiveTracker, parent.relayTracker);
+			try {
+				sender.sendData(tsMsg.getByteArray());
+			} catch (IOException e) {
+				System.out.println(e);
+			}
 		}
 		else if (msgType == PAYLOAD_MESSAGE) {
 			if (debug) System.out.println("  TCPReceiver received PAYLOAD_MESSAGE message...");
-			String msg = "";
-			for (int i = 0; i < msgFields.length; i++){
-				msg += msgFields[i] + " ";
-			}
-			if (debug) System.out.println("    Received message reads: " + msg);
+			if (debug) System.out.println("    Received message reads: " + str);
 			this.pmh = new PayloadMessageHandler((MessagingNode) parent, debug);
-			int next = this.pmh.determineNextID(msg);
+			int next = this.pmh.determineNextID(str);
 			if (next == -1) {
 				parent.receiveTracker++;
-				if (debug) System.out.println(" Consuming message.");
+				if (debug) System.out.println(" Consuming message. This node has received " + parent.receiveTracker + " messages.");
 			}
 			else {
 				parent.relayTracker++;
-				if (debug) System.out.println(" Relaying message.");
+				if (debug) System.out.println(" Relaying message. This node has relayed " + parent.relayTracker + " messages.");
 			}
+		}
+		else if (msgType == TRAFFIC_SUMMARY) {
+			System.out.println(str);
 		}
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");

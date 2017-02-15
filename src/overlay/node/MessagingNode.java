@@ -160,6 +160,7 @@ public class MessagingNode extends Node {
 				if (debug) System.out.println("      Payload message contents: " + pMsg.toString());
 				handler.transmit(pMsg);
 				sendTracker++;
+				if (debug) System.out.println("  Message sent. This node has sent " + sendTracker + " messages.");
 			}
 		}
 		
