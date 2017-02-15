@@ -1,5 +1,7 @@
 package overlay.node;
 
+import java.util.ArrayList;
+
 import overlay.dijkstra.DijkstraNode;
 import overlay.dijkstra.RoutingCache;
 import overlay.transport.TCPServerThread;
@@ -11,6 +13,7 @@ public abstract class Node {
 	public int portNumber = 0;
 	public int serverPortNumber = 0;
 	public TCPServerThread serverThread;
+	public ArrayList<NodeReference> neighbors;
 	public int id = -1;
 	public boolean debug = true;
 	public int currentNeighborCount = 0;

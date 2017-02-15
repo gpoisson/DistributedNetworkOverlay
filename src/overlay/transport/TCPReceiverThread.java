@@ -4,10 +4,12 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import overlay.dijkstra.RoutingCache;
 import overlay.dijkstra.ShortestPath;
 import overlay.node.Node;
+import overlay.node.NodeReference;
 import overlay.wireformats.DeregisterResponse;
 import overlay.wireformats.RegisterResponse;
 
@@ -80,6 +82,19 @@ public class TCPReceiverThread implements Runnable {
 		}
 		if (debug) System.out.println("  This node's ID number is: " + parent.id);
 	}
+	
+	public void compileNodeRefData(String[] msgFields, RoutingCache routingCache, ArrayList<NodeReference> neighbors){
+		for (int node = 0; node < routingCache.dijkstraNodes.size(); node++){
+			NodeReference nodeRef = new NodeReference();
+			int nodeID = routingCache.dijkstraNodes.get(node).id;
+			nodeRef.setId(nodeID);
+			for (int word_index = 0; word_index < msgFields.length; word_index++){
+				if (msgFields[word_index].contains("num:") && (Integer.parseInt(msgFields[word_index + 1])) == nodeID){
+					nodeRef.setPublicPort(Integer.parseInt(msgFields[word_index - 1].split("\t")[0]));
+				}
+			}
+		}
+	}
 
 	// Interpret the received message
 	private void interpret(String str) {
@@ -122,6 +137,7 @@ public class TCPReceiverThread implements Runnable {
 			parent.routingCache = new RoutingCache();
 			ShortestPath pathCalculator = new ShortestPath(msgFields, parent.routingCache, parent.id, parent.debug);
 			pathCalculator.findAllShortestPaths();
+			compileNodeRefData(msgFields, parent.routingCache, parent.neighbors);
 		}
 		else if (msgType == TASK_INITIATE) {
 			if (debug) System.out.println("  TCPReceiver received TASK_INITIATE message...");

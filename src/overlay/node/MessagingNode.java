@@ -18,7 +18,6 @@ public class MessagingNode extends Node {
 	public Socket socket;			// Socket used for transmitting data
 	public TCPSender sender;		// Marshalling of messages into byte[] prior to transmission
 	public Thread receiver;			// Receiver thread listens for incoming connections 
-	public ArrayList<NodeReference> neighbors;
 	public Thread server;
 	public ArrayList<Socket> mNodes;
 	
