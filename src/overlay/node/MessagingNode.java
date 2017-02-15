@@ -19,12 +19,14 @@ public class MessagingNode extends Node {
 	public TCPSender sender;		// Marshalling of messages into byte[] prior to transmission
 	public Thread receiver;			// Receiver thread listens for incoming connections 
 	public Thread server;
-	public ArrayList<Socket> mNodes;
+	public ArrayList<Integer> mNodeIDs;
+	public ArrayList<Socket> mNodeSockets;
 	
 	public MessagingNode() {
 		if (debug) System.out.println("Building messaging node...");
 		neighbors = new ArrayList<NodeReference>();
-		mNodes = new ArrayList<Socket>();
+		mNodeSockets = new ArrayList<Socket>();
+		mNodeIDs = new ArrayList<Integer>();
 	}
 
 	public static void main(String[] args) {
@@ -38,7 +40,7 @@ public class MessagingNode extends Node {
 			mn.hostname = args[0];
 			mn.portNumber = Integer.parseInt(args[1]);
 			
-			mn.serverThread = new TCPServerThread(mn, mn.mNodes, 0, mn.debug);
+			mn.serverThread = new TCPServerThread(mn, mn.mNodeSockets, 0, mn.debug);
 			mn.server = new Thread(mn.serverThread);
 			mn.server.start();
 			
@@ -111,12 +113,14 @@ public class MessagingNode extends Node {
 			try {
 				if (debug) System.out.println(" Establishing a socket to node " + neighbors.get(neighbor).getId() + ": " + neighbors.get(neighbor).getIP() + "  " + neighbors.get(neighbor).getPublicPort());
 				Socket s = new Socket(neighbors.get(neighbor).getIP(), neighbors.get(neighbor).getPublicPort());
-				mNodes.add(s);
+				mNodeSockets.add(s);
+				mNodeIDs.add(neighbors.get(neighbor).getId());
 			} catch (IOException ioe) {
 				System.out.println(ioe);
 			}
 		}
-		if (debug) System.out.println("Made " + mNodes.size() + " sockets.");
+		if (debug) System.out.println("Made " + mNodeSockets.size() + " sockets.");
+		if (debug) System.out.println("Kept " + mNodeIDs.size() + " socket IDs.");
 	}
 		
 	@Override
@@ -139,15 +143,71 @@ public class MessagingNode extends Node {
 			}
 			String randomNodePath = routingCache.dijkstraNodes.get(randomIndex).path;
 			
-			if (debug) System.out.println(" Randomly picked node " + randomNodeID + " to transmit messages...");
+			if (debug) System.out.println(" Randomly picked node " + randomNodeID + " as destination...");
 			for (int msg = 0; msg < messagesPerRound; msg++){
 				PayloadMessage pMsg = new PayloadMessage();
-				pMsg.generatePayload();
 				pMsg.encodeTransmissionPath(randomNodePath);
+				pMsg.getByteArray();
+				if (debug) System.out.println("   Payload message assembled and path encoded. Preparing to transmit...");
+				if (debug) System.out.println("      Payload message contents: " + pMsg.toString());
+				handlePayloadMessage(pMsg);
 			}
 		}
 		
 		// Send TASK_COMPLETE to registry
+	}
+
+	private void handlePayloadMessage(PayloadMessage pMsg) {
+		if (debug) System.out.println(" Handling payload message...");
+		Socket relay;																// Reference to the socket to the next node in the path
+		String[] msgFields = pMsg.toString().split(" ");
+		int startPath = 3;															// Index of first element of the path
+		int endPath = 0;															// Need to find last element of path
+		for (int word_index = 2; word_index < msgFields.length; word_index++){
+			if (msgFields[word_index].contains("<path")){
+				endPath = word_index;
+			}
+		}
+		int pathLength = endPath - startPath;
+		assert (pathLength > 0);													// Path length must be positive or there has been some error
+		int[] path = new int[pathLength];
+		for (int step = startPath; step < endPath; step++){
+			path[step - startPath] = Integer.parseInt(msgFields[step]);
+		}
+		boolean isDestination = false;
+		if (path[path.length-1] == this.id) { isDestination = true; }				// Determine if this is the message's final stop
+		if (!isDestination){
+			if (debug) System.out.println("  Not destination for this message, passing it on...");
+			int next = 0;
+			for (int step = 0; step < path.length; step++){							// Determine where to relay the message to
+				if (path[step] == this.id) { next = path[step + 1]; }
+				if (debug) {
+					System.out.println("  Next step in message path: " + next);
+					String p = "";
+					for (int s = 0; s < path.length; s++){
+						p += path[s] + " ";
+					}
+					System.out.println("  Full path: " + p);
+				}
+				for (int node = 0; node < mNodeIDs.size(); node++){
+					if (mNodeIDs.get(node) == next){
+						relay = mNodeSockets.get(node + 1);
+						try {
+							if (debug) System.out.println("\t  Sending <" + pMsg.toString() + "> to node " + path[step]);
+							TCPSender sender = new TCPSender(relay, this.debug);
+							sender.sendData(pMsg.getByteArray());
+							relayTracker++;
+						} catch (IOException ioe) {
+							System.out.println(ioe);
+						}
+						break;
+					}
+				}
+			}
+		}
+		else if (isDestination){
+			if (debug) System.out.println("  Received payload message at the end of its path. Preparing to process.");
+		}
 	}
 
 	public static void usage() {

@@ -45,13 +45,35 @@ public class OverlayCreator {
 			System.out.println("Number of links adjusted to max number supported by this system. Each node will have " + linksPerNode + " links.");
 		}
 		if (numNodes > 1) {
-			int index_of_node_with_fewest_links = 0;
-			int fewest_number_of_links;
-			int index_of_node_with_second_fewest_links = index_of_node_with_fewest_links + 1;
-			int second_fewest_number_of_links;
 			int number_of_links_in_completed_overlay = numNodes * linksPerNode;
 			int current_number_of_links_in_overlay = 0;
 			
+			for (int node = 0; node < nodeRefs.size(); node++){
+				if (node < nodeRefs.size()-1){
+					connectNodes(node, node + 1);
+					current_number_of_links_in_overlay += 2;
+				}
+				else{
+					connectNodes(node, 0);
+					current_number_of_links_in_overlay += 2;
+				}
+			}
+			
+			Random rand = new Random();
+			while (current_number_of_links_in_overlay < number_of_links_in_completed_overlay){
+				int randNode1 = rand.nextInt(nodeRefs.size());
+				int randNode2 = rand.nextInt(nodeRefs.size());
+				while (nodeRefs.get(randNode1).neighbors.size() >= linksPerNode){
+					randNode1 = rand.nextInt(nodeRefs.size());
+				}
+				while ((randNode1 == randNode2) || (nodeRefs.get(randNode2).neighbors.size() >= linksPerNode) || (nodesAreLinked(randNode1, randNode2))){
+					randNode2 = rand.nextInt(nodeRefs.size());
+				}
+				connectNodes(randNode1, randNode2);
+				current_number_of_links_in_overlay += 2;				
+			}
+			
+			/*
 			fewest_number_of_links = nodeRefs.get(index_of_node_with_fewest_links).neighbors.size();
 			second_fewest_number_of_links = current_number_of_links_in_overlay;
 			
@@ -107,7 +129,7 @@ public class OverlayCreator {
 				}
 				connectNodes(index_of_node_with_fewest_links, index_of_node_with_second_fewest_links);
 				current_number_of_links_in_overlay += 2;
-			}
+			}*/
 			
 		}
 		if (debug) System.out.println(" Registry overlay complete.");
@@ -118,8 +140,11 @@ public class OverlayCreator {
 		if (debug) System.out.println("  Checking if nodes " + nodeRefs.get(index1).getId() + " and " + nodeRefs.get(index2).getId() + " are already connected...");
 		int comparison_ID = nodeRefs.get(index2).getId();
 		for (int i = 0; i < nodeRefs.get(index1).neighbors.size(); i++) {
-			if (debug) System.out.println("   Node " + nodeRefs.get(index1).getId() + " is linked to node " + nodeRefs.get(index1).neighbors.get(i).id + "...");
-			if (nodeRefs.get(index1).neighbors.get(i).id == comparison_ID) { return true; }
+			//if (debug) System.out.println("   Node " + nodeRefs.get(index1).getId() + " is linked to node " + nodeRefs.get(index1).neighbors.get(i).id + "...");
+			if (nodeRefs.get(index1).neighbors.get(i).id == comparison_ID) { 
+				if (debug) System.out.println("   Node " + nodeRefs.get(index1).getId() + " is already connected to " + nodeRefs.get(index2).getId());
+				return true; 
+			}
 		}
 		return false;
 	}

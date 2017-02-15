@@ -16,6 +16,6 @@ public class PayloadMessage extends Message {
 	}
 	
 	public void encodeTransmissionPath(String path){
-		identifier = " -- " + path + " -- " + identifier;
+		identifier = "path> " + path + "<path " + identifier;
 	}
 }

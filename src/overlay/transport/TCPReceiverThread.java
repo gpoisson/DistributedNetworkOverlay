@@ -84,13 +84,24 @@ public class TCPReceiverThread implements Runnable {
 	}
 	
 	public void compileNodeRefData(String[] msgFields, RoutingCache routingCache, ArrayList<NodeReference> neighbors){
+		int parent_index = 0;
 		for (int node = 0; node < routingCache.dijkstraNodes.size(); node++){
+			if (routingCache.dijkstraNodes.get(node).id == parent.id){
+				parent_index = node;
+			}
+		}
+		for (int node = 0; node < routingCache.dijkstraNodes.get(parent_index).neighbors.size(); node++){
 			NodeReference nodeRef = new NodeReference();
-			int nodeID = routingCache.dijkstraNodes.get(node).id;
+			int nodeID = routingCache.dijkstraNodes.get(parent_index).neighbors.get(node);
 			nodeRef.setId(nodeID);
 			for (int word_index = 0; word_index < msgFields.length; word_index++){
 				if (msgFields[word_index].contains("num:") && (Integer.parseInt(msgFields[word_index + 1])) == nodeID){
 					nodeRef.setPublicPort(Integer.parseInt(msgFields[word_index - 1].split("\t")[0]));
+					String ip = msgFields[word_index - 5].split("\t")[0];
+					if (ip.contains("localhost")) { ip = "localhost"; }
+					nodeRef.setIP(ip);
+					nodeRef.setLocalPort(Integer.parseInt(msgFields[word_index - 3].split("\t")[0]));
+					neighbors.add(nodeRef);
 				}
 			}
 		}
@@ -150,7 +161,8 @@ public class TCPReceiverThread implements Runnable {
 			if (debug) System.out.println("  TCPReceiver received PULL_TRAFFIC_SUMMARY message...");
 		}
 		else if (msgType == PAYLOAD_MESSAGE) {
-			
+			if (debug) System.out.println("  TCPReceiver received PAYLOAD_MESSAGE message...");
+			if (debug) System.out.println("    " + msgFields.toString());
 		}
 		else {
 			if (debug) System.out.println("  TCPReceiver received unknown message.");

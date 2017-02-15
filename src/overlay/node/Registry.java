@@ -167,7 +167,11 @@ public class Registry extends Node {
 			}
 			else if (input[0].equals("start")) {
 				// Nodes exchange <numRounds> messages
-				int numRounds = Integer.parseInt(input[1]);
+				int numRounds;
+				if (input.length == 1) 
+					numRounds = 5;
+				else
+					numRounds = Integer.parseInt(input[1]);
 				if (numRounds < 0) {
 					System.out.println("Argument <number-of-rounds> must be a non-negative integer.");
 				}
